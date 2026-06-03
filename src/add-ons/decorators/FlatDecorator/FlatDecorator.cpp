@@ -545,111 +545,113 @@ FlatDecorator::_DrawTab(Decorator::Tab* tab, BRect invalid)
 	ComponentColors colors;
 	_GetComponentColors(COMPONENT_TAB, colors, tab);
 
-	// radius for top rounded corners
-	const float kTabCornerRadius = 4.0f;
-
 	float tabBotton = tabRect.bottom;
 	if (fTopTab != tab)
 		tabBotton -= 1;
 
 	if (tab->look != kLeftTitledWindowLook) {
-		// Step 1: Fill the entire tab area first to avoid artifacts.
-		// This ensures no "garbage" pixels remain from previous draws.
-		fDrawingEngine->FillRect(tabRect, colors[COLOR_TAB]);
+		// Draw tab with rounded top corners using only StrokeLine/FillRect.
+		// Radius of 3 pixels for the rounded corners.
 
-		// Step 2: Clear the top corners with the frame dark color
-		// to create the visual rounded corner effect.
-		// The corners outside the rounded shape show the frame border color.
-		rgb_color cornerColor = colors[COLOR_TAB_FRAME_DARK];
-		// top-left corner
-		BRect leftCorner(tabRect.left, tabRect.top,
-			tabRect.left + kTabCornerRadius, tabRect.top + kTabCornerRadius);
-		fDrawingEngine->FillRect(leftCorner, cornerColor);
-		// top-right corner
-		BRect rightCorner(tabRect.right - kTabCornerRadius, tabRect.top,
-			tabRect.right, tabRect.top + kTabCornerRadius);
-		fDrawingEngine->FillRect(rightCorner, cornerColor);
+		rgb_color frameDark = colors[COLOR_TAB_FRAME_DARK];
+		rgb_color tabColor = colors[COLOR_TAB];
 
-		// Step 3: Fill back the rounded corner interiors with arc fills
-		// (the quarter-circle inside the tab that was just cleared)
-		fDrawingEngine->SetHighColor(colors[COLOR_TAB]);
-		// top-left filled arc
-		fDrawingEngine->DrawArc(
-			BRect(tabRect.left, tabRect.top,
-				tabRect.left + kTabCornerRadius * 2,
-				tabRect.top + kTabCornerRadius * 2),
-			90.0f, 90.0f, true);
-		// top-right filled arc
-		fDrawingEngine->DrawArc(
-			BRect(tabRect.right - kTabCornerRadius * 2, tabRect.top,
-				tabRect.right, tabRect.top + kTabCornerRadius * 2),
-			0.0f, 90.0f, true);
+		// First fill the entire tab to avoid leftover pixels
+		fDrawingEngine->FillRect(BRect(tabRect.left, tabRect.top,
+			tabRect.right, tabBotton), tabColor);
 
-		// Step 4: Draw the outer frame outline with rounded top corners
-		fDrawingEngine->SetHighColor(colors[COLOR_TAB_FRAME_DARK]);
-		// left side (below the rounded corner)
-		fDrawingEngine->StrokeLine(
-			BPoint(tabRect.left, tabRect.top + kTabCornerRadius),
-			tabRect.LeftBottom(), colors[COLOR_TAB_FRAME_DARK]);
-		// top side (between the two rounded corners)
-		fDrawingEngine->StrokeLine(
-			BPoint(tabRect.left + kTabCornerRadius, tabRect.top),
-			BPoint(tabRect.right - kTabCornerRadius, tabRect.top),
-			colors[COLOR_TAB_FRAME_DARK]);
-		// right side (below the rounded corner)
-		fDrawingEngine->StrokeLine(
-			BPoint(tabRect.right, tabRect.top + kTabCornerRadius),
-			tabRect.RightBottom(), colors[COLOR_TAB_FRAME_DARK]);
-		// top-left arc outline
-		fDrawingEngine->DrawArc(
-			BRect(tabRect.left, tabRect.top,
-				tabRect.left + kTabCornerRadius * 2,
-				tabRect.top + kTabCornerRadius * 2),
-			90.0f, 90.0f, false);
-		// top-right arc outline
-		fDrawingEngine->DrawArc(
-			BRect(tabRect.right - kTabCornerRadius * 2, tabRect.top,
-				tabRect.right, tabRect.top + kTabCornerRadius * 2),
-			0.0f, 90.0f, false);
+		// Clear top-left corner (make it frame dark, then we draw the curve)
+		fDrawingEngine->FillRect(BRect(tabRect.left, tabRect.top,
+			tabRect.left + 2, tabRect.top + 2), frameDark);
+		// Clear top-right corner
+		fDrawingEngine->FillRect(BRect(tabRect.right - 2, tabRect.top,
+			tabRect.right, tabRect.top + 2), frameDark);
 
-		// Step 5: Bevel
+		// Draw the outer frame:
+		// top line (between corners)
 		fDrawingEngine->StrokeLine(
-			BPoint(tabRect.left + 1, tabRect.top + kTabCornerRadius),
-			BPoint(tabRect.left + 1, tabBotton),
-			colors[COLOR_TAB]);
+			BPoint(tabRect.left + 3, tabRect.top),
+			BPoint(tabRect.right - 3, tabRect.top), frameDark);
+		// left line (below corner)
 		fDrawingEngine->StrokeLine(
-			BPoint(tabRect.left + kTabCornerRadius, tabRect.top + 1),
-			BPoint(tabRect.right - kTabCornerRadius, tabRect.top + 1),
-			tint_color(colors[COLOR_TAB], 0.9));
+			BPoint(tabRect.left, tabRect.top + 3),
+			BPoint(tabRect.left, tabBotton), frameDark);
+		// right line (below corner)
 		fDrawingEngine->StrokeLine(
-			BPoint(tabRect.right - 1, tabRect.top + kTabCornerRadius),
-			BPoint(tabRect.right - 1, tabBotton),
-			colors[COLOR_TAB]);
+			BPoint(tabRect.right, tabRect.top + 3),
+			BPoint(tabRect.right, tabBotton), frameDark);
 
-		// Step 6: Fill with gradient
+		// Top-left corner pixels (3px radius approximation)
+		fDrawingEngine->StrokeLine(
+			BPoint(tabRect.left + 1, tabRect.top + 1),
+			BPoint(tabRect.left + 1, tabRect.top + 1), frameDark);
+		fDrawingEngine->StrokeLine(
+			BPoint(tabRect.left + 2, tabRect.top),
+			BPoint(tabRect.left + 2, tabRect.top), frameDark);
+		fDrawingEngine->StrokeLine(
+			BPoint(tabRect.left, tabRect.top + 2),
+			BPoint(tabRect.left, tabRect.top + 2), frameDark);
+
+		// Top-right corner pixels (3px radius approximation)
+		fDrawingEngine->StrokeLine(
+			BPoint(tabRect.right - 1, tabRect.top + 1),
+			BPoint(tabRect.right - 1, tabRect.top + 1), frameDark);
+		fDrawingEngine->StrokeLine(
+			BPoint(tabRect.right - 2, tabRect.top),
+			BPoint(tabRect.right - 2, tabRect.top), frameDark);
+		fDrawingEngine->StrokeLine(
+			BPoint(tabRect.right, tabRect.top + 2),
+			BPoint(tabRect.right, tabRect.top + 2), frameDark);
+
+		// Restore tab color inside the rounded corners
+		// (the pixel at (1,2) and (2,1) inside each corner is tab color)
+		fDrawingEngine->StrokeLine(
+			BPoint(tabRect.left + 1, tabRect.top + 2),
+			BPoint(tabRect.left + 1, tabRect.top + 2), tabColor);
+		fDrawingEngine->StrokeLine(
+			BPoint(tabRect.left + 2, tabRect.top + 1),
+			BPoint(tabRect.left + 2, tabRect.top + 1), tabColor);
+
+		fDrawingEngine->StrokeLine(
+			BPoint(tabRect.right - 1, tabRect.top + 2),
+			BPoint(tabRect.right - 1, tabRect.top + 2), tabColor);
+		fDrawingEngine->StrokeLine(
+			BPoint(tabRect.right - 2, tabRect.top + 1),
+			BPoint(tabRect.right - 2, tabRect.top + 1), tabColor);
+
+		// Bevel
+		fDrawingEngine->StrokeLine(BPoint(tabRect.left + 1, tabRect.top + 3),
+			BPoint(tabRect.left + 1, tabBotton), tabColor);
+		fDrawingEngine->StrokeLine(BPoint(tabRect.left + 3, tabRect.top + 1),
+			BPoint(tabRect.right - 3, tabRect.top + 1),
+			tint_color(tabColor, 0.9));
+		fDrawingEngine->StrokeLine(BPoint(tabRect.right - 1, tabRect.top + 3),
+			BPoint(tabRect.right - 1, tabBotton), tabColor);
+
+		// Fill with gradient
 		BGradientLinear gradient;
 		gradient.SetStart(tabRect.LeftTop());
 		gradient.SetEnd(tabRect.LeftBottom());
 		if (tab && tab->buttonFocus) {
-			gradient.AddColor(tint_color(colors[COLOR_TAB], 0.6), 0);
-			gradient.AddColor(tint_color(colors[COLOR_TAB], 1.0), 200);
+			gradient.AddColor(tint_color(tabColor, 0.6), 0);
+			gradient.AddColor(tint_color(tabColor, 1.0), 200);
 		} else {
-			gradient.AddColor(tint_color(colors[COLOR_TAB], 0.9), 0);
-			gradient.AddColor(tint_color(colors[COLOR_TAB], 1.0), 150);
+			gradient.AddColor(tint_color(tabColor, 0.9), 0);
+			gradient.AddColor(tint_color(tabColor, 1.0), 150);
 		}
-		BRect fillRect(tabRect.left + 2, tabRect.top + 2,
-			tabRect.right - 2, tabBotton);
-		fDrawingEngine->DrawRoundRect(fillRect, kTabCornerRadius - 2,
-			kTabCornerRadius - 2, true, gradient);
-		// Overwrite the bottom rounded corners with straight fill
-		if (kTabCornerRadius - 2 > 0) {
-			BRect bottomRect(fillRect.left,
-				fillRect.bottom - (kTabCornerRadius - 2),
-				fillRect.right, fillRect.bottom);
-			fDrawingEngine->FillRect(bottomRect, gradient);
-		}
+		fDrawingEngine->FillRect(BRect(tabRect.left + 2, tabRect.top + 2,
+			tabRect.right - 2, tabBotton), gradient);
+
+		// Re-clear the inner corner pixels that the gradient may have
+		// painted over (top-left and top-right inner corners)
+		fDrawingEngine->StrokeLine(
+			BPoint(tabRect.left + 2, tabRect.top + 2),
+			BPoint(tabRect.left + 2, tabRect.top + 2), frameDark);
+		fDrawingEngine->StrokeLine(
+			BPoint(tabRect.right - 2, tabRect.top + 2),
+			BPoint(tabRect.right - 2, tabRect.top + 2), frameDark);
 	} else {
-		// kLeftTitledWindowLook: outer frame (no rounded corners)
+		// kLeftTitledWindowLook: keep original square corners
 		fDrawingEngine->StrokeLine(tabRect.LeftTop(), tabRect.LeftBottom(),
 			colors[COLOR_TAB_FRAME_DARK]);
 		fDrawingEngine->StrokeLine(tabRect.LeftTop(), tabRect.RightTop(),
