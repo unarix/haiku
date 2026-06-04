@@ -45,7 +45,6 @@ public:
 	virtual void				UpdateColors(DesktopSettings& settings);
 
 protected:
-	virtual	void				_DoLayout();
 	virtual	void				_DrawFrame(BRect rect);
 
 	virtual	void				_DrawTab(Decorator::Tab* tab, BRect r);
