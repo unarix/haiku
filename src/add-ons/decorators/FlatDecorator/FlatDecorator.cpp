@@ -860,7 +860,7 @@ FlatDecorator::_DrawBlendedRect(DrawingEngine* engine, const BRect rect,
 		endColor = tint_color(colors[COLOR_BUTTON], 0.5);
 	}
 
-	// fill
+	// fill (inset by 1 for the outline, then avoid corners)
 	BRect fillRect(rect.InsetByCopy(1.0f, 1.0f));
 
 	BGradientLinear gradient;
@@ -871,9 +871,45 @@ FlatDecorator::_DrawBlendedRect(DrawingEngine* engine, const BRect rect,
 
 	engine->FillRect(fillRect, gradient);
 
-	// outline
-	engine->StrokeRect(rect, tint_color(colors[COLOR_BUTTON], 1.25));
+	// clear the fill pixels at the inner corners (make them transparent)
+	// top-left inner corner
+	engine->StrokeLine(BPoint(fillRect.left, fillRect.top),
+		BPoint(fillRect.left, fillRect.top), B_TRANSPARENT_COLOR);
+	// top-right inner corner
+	engine->StrokeLine(BPoint(fillRect.right, fillRect.top),
+		BPoint(fillRect.right, fillRect.top), B_TRANSPARENT_COLOR);
+	// bottom-left inner corner
+	engine->StrokeLine(BPoint(fillRect.left, fillRect.bottom),
+		BPoint(fillRect.left, fillRect.bottom), B_TRANSPARENT_COLOR);
+	// bottom-right inner corner
+	engine->StrokeLine(BPoint(fillRect.right, fillRect.bottom),
+		BPoint(fillRect.right, fillRect.bottom), B_TRANSPARENT_COLOR);
 
+	// outline with rounded corners (radius 2)
+	rgb_color outlineColor = tint_color(colors[COLOR_BUTTON], 1.25);
+
+	// top line (between corners)
+	engine->StrokeLine(BPoint(rect.left + 2, rect.top),
+		BPoint(rect.right - 2, rect.top), outlineColor);
+	// bottom line (between corners)
+	engine->StrokeLine(BPoint(rect.left + 2, rect.bottom),
+		BPoint(rect.right - 2, rect.bottom), outlineColor);
+	// left line (between corners)
+	engine->StrokeLine(BPoint(rect.left, rect.top + 2),
+		BPoint(rect.left, rect.bottom - 2), outlineColor);
+	// right line (between corners)
+	engine->StrokeLine(BPoint(rect.right, rect.top + 2),
+		BPoint(rect.right, rect.bottom - 2), outlineColor);
+
+	// corner diagonal pixels
+	engine->StrokeLine(BPoint(rect.left + 1, rect.top + 1),
+		BPoint(rect.left + 1, rect.top + 1), outlineColor);
+	engine->StrokeLine(BPoint(rect.right - 1, rect.top + 1),
+		BPoint(rect.right - 1, rect.top + 1), outlineColor);
+	engine->StrokeLine(BPoint(rect.left + 1, rect.bottom - 1),
+		BPoint(rect.left + 1, rect.bottom - 1), outlineColor);
+	engine->StrokeLine(BPoint(rect.right - 1, rect.bottom - 1),
+		BPoint(rect.right - 1, rect.bottom - 1), outlineColor);
 }
 
 
