@@ -56,6 +56,8 @@ protected:
 	virtual	void				_DrawMinimize(Decorator::Tab* tab, bool direct,
 									BRect rect);
 
+	virtual	void				_GetFootprint(BRegion* region);
+
 private:
  			void				_DrawButtonBitmap(ServerBitmap* bitmap,
  									bool direct, BRect rect);
