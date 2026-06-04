@@ -524,7 +524,7 @@ FlatDecorator::_DrawFrame(BRect rect)
 
 
 // The radius used for the rounded top corners of the tab
-static const float kTabCornerRadius = 4.0f;
+static const float kTabCornerRadius = 2.0f;
 
 
 void
@@ -550,32 +550,21 @@ FlatDecorator::_GetFootprint(BRegion* region)
 
 		const BRect& tabRect = tab->tabRect;
 
-		// Exclude top-left corner pixels (3x3 area minus the arc interior)
-		// For a radius of 4, we exclude:
-		// Row 0 (top): 4 pixels from left
-		// Row 1: 2 pixels from left
-		// Row 2: 1 pixel from left
-		// Row 3: 1 pixel from left
+		// Exclude top corner pixels for a 2px radius curve:
+		// Row 0: 2 pixels from each corner
+		// Row 1: 1 pixel from each corner
 
 		// Top-left corner exclusion
 		region->Exclude(BRect(tabRect.left, tabRect.top,
-			tabRect.left + 3, tabRect.top));      // row 0: 4px
+			tabRect.left + 1, tabRect.top));      // row 0: 2px
 		region->Exclude(BRect(tabRect.left, tabRect.top + 1,
-			tabRect.left + 1, tabRect.top + 1));  // row 1: 2px
-		region->Exclude(BRect(tabRect.left, tabRect.top + 2,
-			tabRect.left, tabRect.top + 2));      // row 2: 1px
-		region->Exclude(BRect(tabRect.left, tabRect.top + 3,
-			tabRect.left, tabRect.top + 3));      // row 3: 1px
+			tabRect.left, tabRect.top + 1));      // row 1: 1px
 
 		// Top-right corner exclusion
-		region->Exclude(BRect(tabRect.right - 3, tabRect.top,
-			tabRect.right, tabRect.top));          // row 0: 4px
-		region->Exclude(BRect(tabRect.right - 1, tabRect.top + 1,
-			tabRect.right, tabRect.top + 1));      // row 1: 2px
-		region->Exclude(BRect(tabRect.right, tabRect.top + 2,
-			tabRect.right, tabRect.top + 2));      // row 2: 1px
-		region->Exclude(BRect(tabRect.right, tabRect.top + 3,
-			tabRect.right, tabRect.top + 3));      // row 3: 1px
+		region->Exclude(BRect(tabRect.right - 1, tabRect.top,
+			tabRect.right, tabRect.top));          // row 0: 2px
+		region->Exclude(BRect(tabRect.right, tabRect.top + 1,
+			tabRect.right, tabRect.top + 1));      // row 1: 1px
 	}
 }
 
@@ -618,45 +607,38 @@ FlatDecorator::_DrawTab(Decorator::Tab* tab, BRect invalid)
 		// outer frame:
 		// top line (between the rounded corners)
 		fDrawingEngine->StrokeLine(
-			BPoint(tabRect.left + 4, tabRect.top),
-			BPoint(tabRect.right - 4, tabRect.top), frameDark);
+			BPoint(tabRect.left + 2, tabRect.top),
+			BPoint(tabRect.right - 2, tabRect.top), frameDark);
 		// left line (below the corner curve)
 		fDrawingEngine->StrokeLine(
-			BPoint(tabRect.left, tabRect.top + 4),
+			BPoint(tabRect.left, tabRect.top + 2),
 			BPoint(tabRect.left, tabBotton), frameDark);
 		// right line (below the corner curve)
 		fDrawingEngine->StrokeLine(
-			BPoint(tabRect.right, tabRect.top + 4),
+			BPoint(tabRect.right, tabRect.top + 2),
 			BPoint(tabRect.right, tabBotton), frameDark);
 
-		// Top-left corner curve (frame border pixels)
-		// These are the outermost visible pixels forming the curve
+		// Top-left corner curve pixel
 		fDrawingEngine->StrokeLine(
-			BPoint(tabRect.left + 2, tabRect.top + 1),
-			BPoint(tabRect.left + 3, tabRect.top + 1), frameDark);
+			BPoint(tabRect.left + 1, tabRect.top + 1),
+			BPoint(tabRect.left + 1, tabRect.top + 1), frameDark);
+
+		// Top-right corner curve pixel
+		fDrawingEngine->StrokeLine(
+			BPoint(tabRect.right - 1, tabRect.top + 1),
+			BPoint(tabRect.right - 1, tabRect.top + 1), frameDark);
+
+		// bevel
 		fDrawingEngine->StrokeLine(
 			BPoint(tabRect.left + 1, tabRect.top + 2),
-			BPoint(tabRect.left + 1, tabRect.top + 3), frameDark);
-
-		// Top-right corner curve (frame border pixels)
+			BPoint(tabRect.left + 1, tabBotton), tabColor);
 		fDrawingEngine->StrokeLine(
-			BPoint(tabRect.right - 3, tabRect.top + 1),
-			BPoint(tabRect.right - 2, tabRect.top + 1), frameDark);
-		fDrawingEngine->StrokeLine(
-			BPoint(tabRect.right - 1, tabRect.top + 2),
-			BPoint(tabRect.right - 1, tabRect.top + 3), frameDark);
-
-		// bevel (inner highlight)
-		fDrawingEngine->StrokeLine(
-			BPoint(tabRect.left + 2, tabRect.top + 4),
-			BPoint(tabRect.left + 2, tabBotton), tabColor);
-		fDrawingEngine->StrokeLine(
-			BPoint(tabRect.left + 4, tabRect.top + 2),
-			BPoint(tabRect.right - 4, tabRect.top + 2),
+			BPoint(tabRect.left + 2, tabRect.top + 1),
+			BPoint(tabRect.right - 2, tabRect.top + 1),
 			tint_color(tabColor, 0.9));
 		fDrawingEngine->StrokeLine(
-			BPoint(tabRect.right - 2, tabRect.top + 4),
-			BPoint(tabRect.right - 2, tabBotton), tabColor);
+			BPoint(tabRect.right - 1, tabRect.top + 2),
+			BPoint(tabRect.right - 1, tabBotton), tabColor);
 
 		// fill with gradient
 		BGradientLinear gradient;
@@ -669,21 +651,8 @@ FlatDecorator::_DrawTab(Decorator::Tab* tab, BRect invalid)
 			gradient.AddColor(tint_color(tabColor, 0.9), 0);
 			gradient.AddColor(tint_color(tabColor, 1.0), 150);
 		}
-		fDrawingEngine->FillRect(BRect(tabRect.left + 3, tabRect.top + 3,
-			tabRect.right - 3, tabBotton), gradient);
-
-		// Fill the remaining interior pixels in the corner area that
-		// are inside the footprint but outside the main fill rect
-		// Left side: column 2, rows 2-3
 		fDrawingEngine->FillRect(BRect(tabRect.left + 2, tabRect.top + 2,
-			tabRect.left + 2, tabRect.top + 3), tabColor);
-		// Right side: column right-2, rows 2-3
-		fDrawingEngine->FillRect(BRect(tabRect.right - 2, tabRect.top + 2,
-			tabRect.right - 2, tabRect.top + 3), tabColor);
-		// Top area between bevel and main fill
-		fDrawingEngine->FillRect(BRect(tabRect.left + 3, tabRect.top + 2,
-			tabRect.right - 3, tabRect.top + 2),
-			tint_color(tabColor, 0.9));
+			tabRect.right - 2, tabBotton), gradient);
 	} else {
 		// kLeftTitledWindowLook: keep original square corners
 		fDrawingEngine->StrokeLine(tabRect.LeftTop(), tabRect.LeftBottom(),
