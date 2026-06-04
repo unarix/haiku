@@ -269,6 +269,71 @@ FlatDecorator::UpdateColors(DesktopSettings& settings)
 
 
 void
+FlatDecorator::_DoLayout()
+{
+	// Call the parent to do the standard layout
+	TabDecorator::_DoLayout();
+
+	// Override the border width to make it thinner (more modern look)
+	// The parent sets 5 for titled/document, 3 for floating.
+	// We reduce it to 2 for titled/document, and 1 for floating.
+	const float scaleFactor = max_c(fDrawState.Font().Size() / 12.0f, 1.0f);
+
+	int32 newBorderWidth = 0;
+	switch ((int)fTopTab->look) {
+		case B_MODAL_WINDOW_LOOK:
+			newBorderWidth = 2;
+			break;
+		case B_TITLED_WINDOW_LOOK:
+		case B_DOCUMENT_WINDOW_LOOK:
+			newBorderWidth = 2;
+			break;
+		case B_FLOATING_WINDOW_LOOK:
+		case kLeftTitledWindowLook:
+			newBorderWidth = 1;
+			break;
+		case B_BORDERED_WINDOW_LOOK:
+			newBorderWidth = 1;
+			break;
+		default:
+			return; // no border, nothing to change
+	}
+
+	newBorderWidth = int32(newBorderWidth * scaleFactor);
+
+	if (newBorderWidth == fBorderWidth)
+		return;
+
+	fBorderWidth = newBorderWidth;
+
+	// Recalculate border rects with the new width
+	if (fBorderWidth > 0) {
+		fLeftBorder.Set(fFrame.left - fBorderWidth, fFrame.top,
+			fFrame.left - 1, fFrame.bottom);
+		fRightBorder.Set(fFrame.right + 1, fFrame.top,
+			fFrame.right + fBorderWidth, fFrame.bottom);
+		fTopBorder.Set(fFrame.left - fBorderWidth,
+			fFrame.top - fBorderWidth,
+			fFrame.right + fBorderWidth, fFrame.top - 1);
+		fBottomBorder.Set(fFrame.left - fBorderWidth, fFrame.bottom + 1,
+			fFrame.right + fBorderWidth,
+			fFrame.bottom + fBorderWidth);
+	}
+
+	fBorderRect = BRect(fTopBorder.LeftTop(), fBottomBorder.RightBottom());
+
+	// Recalculate resize rect
+	if (fBorderWidth > 1) {
+		fResizeRect.Set(fBottomBorder.right - fResizeKnobSize,
+			fBottomBorder.bottom - fResizeKnobSize,
+			fBottomBorder.right, fBottomBorder.bottom);
+	} else {
+		fResizeRect.Set(0, 0, -1, -1);
+	}
+}
+
+
+void
 FlatDecorator::_DrawFrame(BRect rect)
 {
 	STRACE(("_DrawFrame(%f,%f,%f,%f)\n", rect.left, rect.top,
@@ -295,7 +360,7 @@ FlatDecorator::_DrawFrame(BRect rect)
 				ComponentColors colors;
 				_GetComponentColors(COMPONENT_LEFT_BORDER, colors, fTopTab);
 
-				for (int8 i = 0; i < 5; i++) {
+				for (int8 i = 0; i < fBorderWidth; i++) {
 					fDrawingEngine->StrokeLine(BPoint(r.left + i, r.top + i),
 						BPoint(r.left + i, r.bottom - i), colors[i]);
 				}
@@ -309,7 +374,7 @@ FlatDecorator::_DrawFrame(BRect rect)
 				ComponentColors colors;
 				_GetComponentColors(COMPONENT_BOTTOM_BORDER, colors, fTopTab);
 
-				for (int8 i = 0; i < 5; i++) {
+				for (int8 i = 0; i < fBorderWidth; i++) {
 					fDrawingEngine->StrokeLine(BPoint(r.left + i, r.bottom - i),
 						BPoint(r.right - i, r.bottom - i),
 						colors[i]);
@@ -320,7 +385,7 @@ FlatDecorator::_DrawFrame(BRect rect)
 				ComponentColors colors;
 				_GetComponentColors(COMPONENT_RIGHT_BORDER, colors, fTopTab);
 
-				for (int8 i = 0; i < 5; i++) {
+				for (int8 i = 0; i < fBorderWidth; i++) {
 						fDrawingEngine->StrokeLine(BPoint(r.right - i, r.top + i),
 							BPoint(r.right - i, r.bottom - i),
 							colors[i]);
@@ -335,17 +400,9 @@ FlatDecorator::_DrawFrame(BRect rect)
 				ComponentColors colors;
 				_GetComponentColors(COMPONENT_TOP_BORDER, colors, fTopTab);
 
-				for (int8 i = 0; i < 5; i++) {
-					if (i<4)
-					{
-						fDrawingEngine->StrokeLine(BPoint(r.left + 1, r.top + i),
-							BPoint(r.right - 1, r.top + i), tint_color(colors[i], (i*0.01+1)));
-					}
-					else
-					{
-						fDrawingEngine->StrokeLine(BPoint(r.left + 1, r.top + i),
-							BPoint(r.right - 1, r.top + i), tint_color(colors[3], 1.1));
-					}
+				for (int8 i = 0; i < fBorderWidth; i++) {
+					fDrawingEngine->StrokeLine(BPoint(r.left + 1, r.top + i),
+						BPoint(r.right - 1, r.top + i), colors[i]);
 				}
 			}
 			break;
@@ -359,7 +416,7 @@ FlatDecorator::_DrawFrame(BRect rect)
 				ComponentColors colors;
 				_GetComponentColors(COMPONENT_TOP_BORDER, colors, fTopTab);
 
-				for (int8 i = 0; i < 3; i++) {
+				for (int8 i = 0; i < fBorderWidth; i++) {
 					fDrawingEngine->StrokeLine(BPoint(r.left + i, r.top + i),
 						BPoint(r.right - i, r.top + i), tint_color(colors[1], 0.95));
 				}
@@ -378,7 +435,7 @@ FlatDecorator::_DrawFrame(BRect rect)
 				ComponentColors colors;
 				_GetComponentColors(COMPONENT_LEFT_BORDER, colors, fTopTab);
 
-				for (int8 i = 0; i < 3; i++) {
+				for (int8 i = 0; i < fBorderWidth; i++) {
 					fDrawingEngine->StrokeLine(BPoint(r.left + i, r.top + i),
 						BPoint(r.left + i, r.bottom - i), colors[i * 2]);
 				}
@@ -398,7 +455,7 @@ FlatDecorator::_DrawFrame(BRect rect)
 				ComponentColors colors;
 				_GetComponentColors(COMPONENT_BOTTOM_BORDER, colors, fTopTab);
 
-				for (int8 i = 0; i < 3; i++) {
+				for (int8 i = 0; i < fBorderWidth; i++) {
 					fDrawingEngine->StrokeLine(BPoint(r.left + i, r.bottom - i),
 						BPoint(r.right - i, r.bottom - i),
 						colors[(2 - i) == 2 ? 5 : (2 - i) * 2]);
@@ -409,7 +466,7 @@ FlatDecorator::_DrawFrame(BRect rect)
 				ComponentColors colors;
 				_GetComponentColors(COMPONENT_RIGHT_BORDER, colors, fTopTab);
 
-				for (int8 i = 0; i < 3; i++) {
+				for (int8 i = 0; i < fBorderWidth; i++) {
 					fDrawingEngine->StrokeLine(BPoint(r.right - i, r.top + i),
 						BPoint(r.right - i, r.bottom - i),
 						colors[(2 - i) == 2 ? 5 : (2 - i) * 2]);
