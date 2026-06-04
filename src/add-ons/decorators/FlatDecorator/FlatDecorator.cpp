@@ -330,6 +330,14 @@ FlatDecorator::_DoLayout()
 	} else {
 		fResizeRect.Set(0, 0, -1, -1);
 	}
+
+	// Recalculate tab layout with the new border width
+	if (fTopTab->look == B_TITLED_WINDOW_LOOK
+		|| fTopTab->look == B_DOCUMENT_WINDOW_LOOK
+		|| fTopTab->look == B_FLOATING_WINDOW_LOOK
+		|| fTopTab->look == kLeftTitledWindowLook) {
+		_DoTabLayout();
+	}
 }
 
 
