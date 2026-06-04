@@ -331,12 +331,24 @@ FlatDecorator::_DoLayout()
 		fResizeRect.Set(0, 0, -1, -1);
 	}
 
-	// Recalculate tab layout with the new border width
+	// Recalculate tab layout with the new border width, but keep
+	// the original tab size by temporarily using the old border width
+	// for tab calculations
 	if (fTopTab->look == B_TITLED_WINDOW_LOOK
 		|| fTopTab->look == B_DOCUMENT_WINDOW_LOOK
 		|| fTopTab->look == B_FLOATING_WINDOW_LOOK
 		|| fTopTab->look == kLeftTitledWindowLook) {
+		int32 savedBorderWidth = fBorderWidth;
+		// Use the original large border width for tab sizing
+		fBorderWidth = int32(5 * scaleFactor);
+		if (fTopTab->look == B_FLOATING_WINDOW_LOOK
+			|| fTopTab->look == kLeftTitledWindowLook)
+			fBorderWidth = int32(3 * scaleFactor);
+
 		_DoTabLayout();
+
+		// Restore our thin border width
+		fBorderWidth = savedBorderWidth;
 	}
 }
 
