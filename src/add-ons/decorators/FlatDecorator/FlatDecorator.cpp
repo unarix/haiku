@@ -321,14 +321,16 @@ FlatDecorator::_DrawFrame(BRect rect)
 				_GetComponentColors(COMPONENT_RIGHT_BORDER, colors, fTopTab);
 
 				for (int8 i = 0; i < 5; i++) {
-						fDrawingEngine->StrokeLine(BPoint(r.right - i, r.top + i),
+						fDrawingEngine->StrokeLine(BPoint(r.right - i, r.top + i + 2),
 							BPoint(r.right - i, r.bottom - i),
 							colors[i]);
 				}
+				// rounded top-right corner: diagonal pixel for outermost border
+				fDrawingEngine->StrokeLine(BPoint(r.right - 1, r.top + 1),
+					BPoint(r.right - 1, r.top + 1), colors[0]);
 				// redraw line to be part of tab title
-				fDrawingEngine->StrokeLine(BPoint(r.right, r.top),
-					BPoint(r.right, r.top + 4),
-					colors[6]);
+				fDrawingEngine->StrokeLine(BPoint(r.right, r.top + 2),
+					BPoint(r.right, r.top + 4), colors[6]);
 			}
 			// top
 			if (rect.Intersects(fTopBorder)) {
@@ -336,15 +338,21 @@ FlatDecorator::_DrawFrame(BRect rect)
 				_GetComponentColors(COMPONENT_TOP_BORDER, colors, fTopTab);
 
 				for (int8 i = 0; i < 5; i++) {
+					// Shorten the top lines to leave room for the rounded
+					// top-right corner (2px radius)
+					float rightEnd = r.right - 1 - i;
+					if (i == 0)
+						rightEnd = r.right - 2; // row 0: stop 2px before right edge
+
 					if (i<4)
 					{
 						fDrawingEngine->StrokeLine(BPoint(r.left + 1, r.top + i),
-							BPoint(r.right - 1, r.top + i), tint_color(colors[i], (i*0.01+1)));
+							BPoint(rightEnd, r.top + i), tint_color(colors[i], (i*0.01+1)));
 					}
 					else
 					{
 						fDrawingEngine->StrokeLine(BPoint(r.left + 1, r.top + i),
-							BPoint(r.right - 1, r.top + i), tint_color(colors[3], 1.1));
+							BPoint(rightEnd, r.top + i), tint_color(colors[3], 1.1));
 					}
 				}
 			}
@@ -565,6 +573,21 @@ FlatDecorator::_GetFootprint(BRegion* region)
 			tabRect.right, tabRect.top));          // row 0: 2px
 		region->Exclude(BRect(tabRect.right, tabRect.top + 1,
 			tabRect.right, tabRect.top + 1));      // row 1: 1px
+	}
+
+	// Exclude the top-right corner of the window frame
+	// (where the right border meets the top border)
+	if (fTopTab->look == B_TITLED_WINDOW_LOOK
+		|| fTopTab->look == B_DOCUMENT_WINDOW_LOOK
+		|| fTopTab->look == B_MODAL_WINDOW_LOOK) {
+
+		BRect r = BRect(fTopBorder.LeftTop(), fBottomBorder.RightBottom());
+
+		// Top-right corner of frame: same 2px radius
+		region->Exclude(BRect(r.right - 1, r.top,
+			r.right, r.top));              // row 0: 2px
+		region->Exclude(BRect(r.right, r.top + 1,
+			r.right, r.top + 1));          // row 1: 1px
 	}
 }
 
