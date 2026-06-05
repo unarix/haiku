@@ -325,9 +325,6 @@ FlatDecorator::_DrawFrame(BRect rect)
 							BPoint(r.right - i, r.bottom - i),
 							colors[i]);
 				}
-				// rounded top-right corner: diagonal pixel for outermost border
-				fDrawingEngine->StrokeLine(BPoint(r.right - 1, r.top + 1),
-					BPoint(r.right - 1, r.top + 1), colors[0]);
 				// redraw line to be part of tab title
 				fDrawingEngine->StrokeLine(BPoint(r.right, r.top + 2),
 					BPoint(r.right, r.top + 4), colors[6]);
@@ -355,6 +352,14 @@ FlatDecorator::_DrawFrame(BRect rect)
 							BPoint(rightEnd, r.top + i), tint_color(colors[3], 1.1));
 					}
 				}
+			}
+			// Draw the rounded top-right corner diagonal pixel last,
+			// after both right and top borders, so nothing overwrites it.
+			{
+				ComponentColors colors;
+				_GetComponentColors(COMPONENT_RIGHT_BORDER, colors, fTopTab);
+				fDrawingEngine->StrokeLine(BPoint(r.right - 1, r.top + 1),
+					BPoint(r.right - 1, r.top + 1), colors[0]);
 			}
 			break;
 		}

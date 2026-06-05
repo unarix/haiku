@@ -1610,6 +1610,14 @@ FlatControlLook::_DrawButtonBackground(BView* view, BRect& rect,
 			flatBase = view->Parent()->LowColor();
 		_DrawFlatButtonBackground(view, rect, updateRect, flatBase, popupIndicator,
 			flags, borders, orientation);
+	} else if ((flags & B_FLAT) != 0
+		&& (flags & (B_ACTIVATED | B_PARTIALLY_ACTIVATED)) == 0
+		&& (flags & B_HOVER) != 0) {
+		// Flat button with hover: draw a subtle solid highlight, no gradient
+		rgb_color hoverColor = (base.IsDark())
+			? tint_color(base, 0.85) : tint_color(base, 1.1);
+		_DrawFlatButtonBackground(view, rect, updateRect, hoverColor, popupIndicator,
+			flags, borders, orientation);
 	} else {
 		BRegion clipping(rect);
 		_DrawNonFlatButtonBackground(view, rect, updateRect, clipping,
