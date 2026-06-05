@@ -1745,16 +1745,7 @@ FlatControlLook::_DrawButtonBackground(BView* view, BRect& rect,
 
 	// If the button is flat and neither activated nor otherwise highlighted
 	// (mouse hovering or focussed), draw it flat.
-	if ((flags & B_FLAT) != 0 && rect.Height() < 20.0f
-		&& (flags & B_HOVER) == 0) {
-		// Flat narrow button (e.g. column title buttons):
-		// always draw completely flat regardless of activated state
-		rgb_color flatBase = base;
-		if (view->Parent() != NULL)
-			flatBase = view->Parent()->LowColor();
-		_DrawFlatButtonBackground(view, rect, updateRect, flatBase, popupIndicator,
-			flags, borders, orientation);
-	} else if ((flags & B_FLAT) != 0
+	if ((flags & B_FLAT) != 0
 		&& (flags & (B_ACTIVATED | B_PARTIALLY_ACTIVATED)) == 0
 		&& ((flags & (B_HOVER | B_FOCUSED)) == 0
 			|| (flags & B_DISABLED) != 0)) {
@@ -1763,20 +1754,11 @@ FlatControlLook::_DrawButtonBackground(BView* view, BRect& rect,
 			flatBase = view->Parent()->LowColor();
 		_DrawFlatButtonBackground(view, rect, updateRect, flatBase, popupIndicator,
 			flags, borders, orientation);
-	} else if ((flags & B_FLAT) != 0
-		&& (flags & (B_ACTIVATED | B_PARTIALLY_ACTIVATED)) == 0
-		&& (flags & B_HOVER) != 0) {
-		// Flat button with hover: draw a subtle solid highlight, no gradient
-		rgb_color hoverColor = (base.IsDark())
-			? tint_color(base, 0.85) : tint_color(base, 1.1);
-		_DrawFlatButtonBackground(view, rect, updateRect, hoverColor, popupIndicator,
-			flags, borders, orientation);
 	} else {
 		BRegion clipping(rect);
-		rgb_color customColor = ui_color(B_CONTROL_BACKGROUND_COLOR);
 		_DrawNonFlatButtonBackground(view, rect, updateRect, clipping,
 			leftTopRadius, rightTopRadius, leftBottomRadius, rightBottomRadius,
-			customColor, popupIndicator, flags, borders, orientation);
+			base, popupIndicator, flags, borders, orientation);
 	}
 
 	// restore the clipping constraints of the view
