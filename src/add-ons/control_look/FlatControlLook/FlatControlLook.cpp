@@ -1743,8 +1743,8 @@ FlatControlLook::_DrawButtonBackground(BView* view, BRect& rect,
 	// set clipping constraints to updateRect
 	view->ClipToRect(rect);
 
-	// If the button has no borders, draw it with a flat solid color (e.g. column headers)
-	if (borders == 0) {
+	// If the button is flat with partial borders (e.g. column headers), draw flat
+	if ((flags & B_FLAT) != 0 && borders != B_ALL_BORDERS) {
 		rgb_color debugColor = {255, 0, 0, 255}; // RED for identification
 		view->SetHighColor(debugColor);
 		view->FillRect(rect);
