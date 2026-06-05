@@ -344,10 +344,12 @@ FlatDecorator::_DrawFrame(BRect rect)
 				_GetComponentColors(COMPONENT_TOP_BORDER, colors, fTopTab);
 
 				for (int8 i = 0; i < 5; i++) {
-					// Only the top line (i=0) is shortened for the rounded corner
+					// Shorten top lines for the rounded top-right corner
 					float rightEnd = r.right - 1;
 					if (i == 0)
-						rightEnd = r.right - 2;
+						rightEnd = r.right - 2; // row 0: 2px shorter
+					else if (i == 1)
+						rightEnd = r.right - 2; // row 1: 1px shorter (diagonal pixel)
 
 					if (i<4)
 					{
