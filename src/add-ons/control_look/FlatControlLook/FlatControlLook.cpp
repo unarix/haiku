@@ -1743,13 +1743,12 @@ FlatControlLook::_DrawButtonBackground(BView* view, BRect& rect,
 	// set clipping constraints to updateRect
 	view->ClipToRect(rect);
 
-	// Debug: identify what borders value column headers use
-	if (borders != B_ALL_BORDERS && borders != 0) {
+	// If the button has partial borders but no left/right borders (e.g. column headers), draw flat
+	if (borders != B_ALL_BORDERS && borders != 0
+		&& (borders & (B_LEFT_BORDER | B_RIGHT_BORDER)) == 0) {
 		rgb_color debugColor = {255, 0, 0, 255}; // RED for identification
 		view->SetHighColor(debugColor);
 		view->FillRect(rect);
-		printf("Button borders=%u flags=%u rect=(%.0f,%.0f,%.0f,%.0f) popup=%d\n",
-			borders, flags, rect.left, rect.top, rect.right, rect.bottom, popupIndicator);
 		view->PopState();
 		return;
 	}
