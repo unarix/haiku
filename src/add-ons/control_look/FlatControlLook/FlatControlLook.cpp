@@ -1563,7 +1563,7 @@ FlatControlLook::_DrawButtonFrame(BView* view, BRect& rect,
 	if (!ShouldDraw(view, rect, updateRect))
 		return;
 
-	const rgb_color customColor = background; // custom color for borders
+	rgb_color customColor = ui_color(B_PANEL_BACKGROUND_COLOR);
 	rgb_color customColor2 = tint_color(ui_color(B_CONTROL_TEXT_COLOR), 0.55);
 
 	if (customColor.IsDark())
@@ -1579,16 +1579,16 @@ FlatControlLook::_DrawButtonFrame(BView* view, BRect& rect,
 	// (mouse hovering or focussed), draw it flat.
 	if ((flags & B_FLAT) != 0 && (flags & (B_ACTIVATED | B_PARTIALLY_ACTIVATED)) == 0
 		&& ((flags & (B_HOVER | B_FOCUSED)) == 0 || (flags & B_DISABLED) != 0)) {
-		_DrawFrame(view, rect, background, background, background, background, borders);
-		_DrawFrame(view, rect, background, background, background, background, borders);
+		_DrawFrame(view, rect, customColor, customColor, customColor, customColor, borders);
+		_DrawFrame(view, rect, customColor, customColor, customColor, customColor, borders);
 		view->PopState();
 		return;
 	}
 
 	// outer edge colors
-	rgb_color edgeLightColor = background;
-	rgb_color edgeShadowColor = background;
-	rgb_color cornerBgColor = background;
+	rgb_color edgeLightColor = customColor;
+	rgb_color edgeShadowColor = customColor;
+	rgb_color cornerBgColor = customColor;
 
 	drawing_mode oldMode = view->DrawingMode();
 
@@ -1597,9 +1597,9 @@ FlatControlLook::_DrawButtonFrame(BView* view, BRect& rect,
 		rect.InsetBy(1, 1);
 		rect.InsetBy(1, 1);
 
-		cornerBgColor = tint_color(ui_color(B_WINDOW_TAB_COLOR), tint);
+		cornerBgColor = tint_color(ui_color(B_WINDOW_TAB_COLOR),tint);
 
-		view->SetHighColor(tint_color(ui_color(B_WINDOW_TAB_COLOR), tint));
+		view->SetHighColor(tint_color(ui_color(B_WINDOW_TAB_COLOR),tint));
 		view->StrokeRoundRect(rect, leftTopRadius, leftTopRadius);
 		rect.InsetBy(1, 1);
 	} else {
@@ -1617,8 +1617,8 @@ FlatControlLook::_DrawButtonFrame(BView* view, BRect& rect,
 
 	if ((flags & B_DISABLED) != 0) {
 		float tint = (base.IsDark()) ? 1.1 : 0.9;
-		frameLightColor = tint_color(customColor2, tint);
-		frameShadowColor = tint_color(customColor2, tint);
+		frameLightColor = tint_color(customColor2,tint);
+		frameShadowColor = tint_color(customColor2,tint);
 	}
 
 	// rounded corners
@@ -1675,12 +1675,12 @@ FlatControlLook::_DrawButtonFrame(BView* view, BRect& rect,
 
 	// draw outer edge
 	if ((flags & B_DEFAULT_BUTTON) != 0) {
-		_DrawOuterResessedFrame(view, rect, background, 0, 0, flags, borders);
+		_DrawOuterResessedFrame(view, rect, customColor, 0, 0, flags, borders);
 	} else {
 		if ((flags & B_FOCUSED) != 0)
-			_DrawOuterResessedFrame(view, rect, tint_color(background, 1.15), 0, 0);
+			_DrawOuterResessedFrame(view, rect, customColor, 0, 0, flags, borders);
 		else
-			_DrawOuterResessedFrame(view, rect, background, 0, 0, flags, borders);
+			_DrawOuterResessedFrame(view, rect, customColor, 0, 0, flags, borders);
 	}
 
 	view->SetDrawingMode(oldMode);
