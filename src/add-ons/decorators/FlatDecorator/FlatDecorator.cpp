@@ -321,10 +321,19 @@ FlatDecorator::_DrawFrame(BRect rect)
 				_GetComponentColors(COMPONENT_RIGHT_BORDER, colors, fTopTab);
 
 				for (int8 i = 0; i < 5; i++) {
-						fDrawingEngine->StrokeLine(BPoint(r.right - i, r.top + i + 2),
-							BPoint(r.right - i, r.bottom - i),
-							colors[i]);
+					// Only the outermost line (i=0) needs to start lower
+					// for the rounded corner. Inner lines are unaffected.
+					float startY = r.top + i;
+					if (i == 0)
+						startY = r.top + 2; // skip the 2 excluded pixels
+
+					fDrawingEngine->StrokeLine(BPoint(r.right - i, startY),
+						BPoint(r.right - i, r.bottom - i),
+						colors[i]);
 				}
+				// rounded top-right corner: diagonal pixel for outermost border
+				fDrawingEngine->StrokeLine(BPoint(r.right - 1, r.top + 1),
+					BPoint(r.right - 1, r.top + 1), colors[0]);
 				// redraw line to be part of tab title
 				fDrawingEngine->StrokeLine(BPoint(r.right, r.top + 2),
 					BPoint(r.right, r.top + 4), colors[6]);
@@ -335,11 +344,10 @@ FlatDecorator::_DrawFrame(BRect rect)
 				_GetComponentColors(COMPONENT_TOP_BORDER, colors, fTopTab);
 
 				for (int8 i = 0; i < 5; i++) {
-					// Shorten the top lines to leave room for the rounded
-					// top-right corner (2px radius)
-					float rightEnd = r.right - 1 - i;
+					// Only the top line (i=0) is shortened for the rounded corner
+					float rightEnd = r.right - 1;
 					if (i == 0)
-						rightEnd = r.right - 2; // row 0: stop 2px before right edge
+						rightEnd = r.right - 2;
 
 					if (i<4)
 					{
@@ -352,14 +360,6 @@ FlatDecorator::_DrawFrame(BRect rect)
 							BPoint(rightEnd, r.top + i), tint_color(colors[3], 1.1));
 					}
 				}
-			}
-			// Draw the rounded top-right corner diagonal pixel last,
-			// after both right and top borders, so nothing overwrites it.
-			{
-				ComponentColors colors;
-				_GetComponentColors(COMPONENT_RIGHT_BORDER, colors, fTopTab);
-				fDrawingEngine->StrokeLine(BPoint(r.right - 1, r.top + 1),
-					BPoint(r.right - 1, r.top + 1), colors[0]);
 			}
 			break;
 		}
