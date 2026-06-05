@@ -333,7 +333,7 @@ FlatDecorator::_DrawFrame(BRect rect)
 				}
 				// rounded top-right corner: diagonal pixel for outermost border
 				fDrawingEngine->StrokeLine(BPoint(r.right - 1, r.top + 1),
-					BPoint(r.right - 1, r.top + 1), colors[0]);
+					BPoint(r.right - 1, r.top + 1), colors[6]);
 				// redraw line to be part of tab title
 				fDrawingEngine->StrokeLine(BPoint(r.right, r.top + 2),
 					BPoint(r.right, r.top + 4), colors[6]);
