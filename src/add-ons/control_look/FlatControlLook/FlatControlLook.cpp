@@ -304,6 +304,150 @@ FlatControlLook::DrawMenuItemBackground(BView* view, BRect& rect,
 
 
 void
+FlatControlLook::DrawCheckBox(BView* view, BRect& rect, const BRect& updateRect,
+	const rgb_color& base, uint32 flags)
+{
+	if (!ShouldDraw(view, rect, updateRect))
+		return;
+
+	rgb_color customBaseColor = ui_color(B_DOCUMENT_BACKGROUND_COLOR);
+	rgb_color customMarkColor = ui_color(B_WINDOW_TAB_COLOR);
+	rgb_color customFrameColor = tint_color(ui_color(B_CONTROL_TEXT_COLOR), 0.55);
+
+	if (customBaseColor.IsDark())
+		customFrameColor = tint_color(ui_color(B_CONTROL_TEXT_COLOR), 1.55);
+
+	rgb_color dark1BorderColor = (customBaseColor.IsDark())
+		? tint_color(ui_color(B_DOCUMENT_BACKGROUND_COLOR), 0.9)
+		: tint_color(ui_color(B_DOCUMENT_BACKGROUND_COLOR), 1.2);
+
+	rgb_color dark2BorderColor = dark1BorderColor;
+	rgb_color navigationColor = ui_color(B_KEYBOARD_NAVIGATION_COLOR);
+
+	if ((flags & B_DISABLED) != 0) {
+		_DrawOuterResessedFrame(view, rect, customFrameColor, 0.0, 1.0, flags);
+	} else if ((flags & B_CLICKED) != 0) {
+		_DrawOuterResessedFrame(view, rect, ui_color(B_CONTROL_TEXT_COLOR), 0.0, 1.0, flags);
+	} else {
+		_DrawOuterResessedFrame(view, rect, customFrameColor, 0.0, 1.0, flags);
+	}
+
+	if ((flags & B_FOCUSED) != 0) {
+		dark1BorderColor = navigationColor;
+		dark2BorderColor = navigationColor;
+	}
+
+	_DrawFrame(view, rect,
+		dark1BorderColor, dark1BorderColor,
+		dark2BorderColor, dark2BorderColor);
+
+	if ((flags & B_DISABLED) != 0)
+		_FillGradient(view, rect, customBaseColor, 1.0, 1.0);
+	else
+		_FillGradient(view, rect, customBaseColor, 1.0, 1.0);
+
+	rgb_color markColor;
+	if (_RadioButtonAndCheckBoxMarkColor(customBaseColor, markColor, flags)) {
+		view->SetHighColor(customMarkColor);
+
+		BFont font;
+		view->GetFont(&font);
+		float inset = std::max(2.0f, roundf(font.Size() / 6));
+		rect.InsetBy(inset, inset);
+
+		float penSize = std::max(1.0f, ceilf(rect.Width() / 3.5f));
+		if (penSize > 1.0f && fmodf(penSize, 2.0f) == 0.0f) {
+			rect.right++;
+			rect.bottom++;
+		}
+
+		view->SetPenSize(penSize);
+		view->SetDrawingMode(B_OP_OVER);
+		view->StrokeLine(rect.LeftTop(), rect.RightBottom());
+		view->StrokeLine(rect.LeftBottom(), rect.RightTop());
+	}
+}
+
+
+void
+FlatControlLook::DrawRadioButton(BView* view, BRect& rect, const BRect& updateRect,
+	const rgb_color& base, uint32 flags)
+{
+	if (!ShouldDraw(view, rect, updateRect))
+		return;
+
+	rgb_color customBaseColor = ui_color(B_DOCUMENT_BACKGROUND_COLOR);
+	rgb_color customMarkColor = ui_color(B_WINDOW_TAB_COLOR);
+	rgb_color customFrameColor = base;
+
+	if (base.Brightness() < 127)
+		customFrameColor = tint_color(base, 0.6);
+
+	rgb_color borderColor;
+	rgb_color bevelLight;
+	rgb_color bevelShadow;
+	rgb_color navigationColor = ui_color(B_KEYBOARD_NAVIGATION_COLOR);
+
+	if ((flags & B_DISABLED) != 0) {
+		borderColor = tint_color(customFrameColor, 1.15);
+		bevelLight = customFrameColor;
+		bevelShadow = customFrameColor;
+	} else if ((flags & B_CLICKED) != 0) {
+		borderColor = tint_color(customFrameColor, 1.50);
+		bevelLight = borderColor;
+		bevelShadow = borderColor;
+	} else {
+		borderColor = tint_color(customFrameColor, 1.21);
+		bevelLight = tint_color(customFrameColor, 0.55);
+		bevelShadow = tint_color(customFrameColor, 1.21);
+	}
+
+	if ((flags & B_FOCUSED) != 0) {
+		borderColor = navigationColor;
+	}
+
+	BGradientLinear bevelGradient;
+	bevelGradient.AddColor(bevelShadow, 0);
+	bevelGradient.AddColor(bevelLight, 255);
+	bevelGradient.SetStart(rect.LeftTop());
+	bevelGradient.SetEnd(rect.RightBottom());
+
+	view->FillEllipse(rect, bevelGradient);
+	rect.InsetBy(1, 1);
+
+	bevelGradient.MakeEmpty();
+	bevelGradient.AddColor(borderColor, 0);
+	bevelGradient.AddColor(tint_color(borderColor, 0.8), 255);
+	view->FillEllipse(rect, bevelGradient);
+	rect.InsetBy(1, 1);
+
+	float topTint;
+	float bottomTint;
+	if ((flags & B_DISABLED) != 0) {
+		topTint = 0.4;
+		bottomTint = 0.2;
+	} else {
+		topTint = 0.15;
+		bottomTint = 0.0;
+	}
+
+	BGradientLinear gradient;
+	_MakeGradient(gradient, rect, customBaseColor, topTint, bottomTint);
+	view->FillEllipse(rect, gradient);
+
+	rgb_color markColor;
+	if (_RadioButtonAndCheckBoxMarkColor(customBaseColor, markColor, flags)) {
+		view->SetHighColor(customMarkColor);
+		BFont font;
+		view->GetFont(&font);
+		float inset = roundf(font.Size() / 4);
+		rect.InsetBy(inset, inset);
+		view->FillEllipse(rect);
+	}
+}
+
+
+void
 FlatControlLook::DrawScrollBarBorder(BView* view, BRect rect,
 	const BRect& updateRect, const rgb_color& base, uint32 flags,
 	orientation orientation)
@@ -1620,9 +1764,10 @@ FlatControlLook::_DrawButtonBackground(BView* view, BRect& rect,
 			flags, borders, orientation);
 	} else {
 		BRegion clipping(rect);
+		rgb_color customColor = ui_color(B_CONTROL_BACKGROUND_COLOR);
 		_DrawNonFlatButtonBackground(view, rect, updateRect, clipping,
 			leftTopRadius, rightTopRadius, leftBottomRadius, rightBottomRadius,
-			base, popupIndicator, flags, borders, orientation);
+			customColor, popupIndicator, flags, borders, orientation);
 	}
 
 	// restore the clipping constraints of the view
