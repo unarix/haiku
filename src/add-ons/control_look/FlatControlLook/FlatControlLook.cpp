@@ -1752,8 +1752,7 @@ FlatControlLook::_DrawButtonBackground(BView* view, BRect& rect,
 	// If the button has partial borders but no left/right borders (e.g. column headers), draw flat
 	if (borders != B_ALL_BORDERS && borders != 0
 		&& (borders & (B_LEFT_BORDER | B_RIGHT_BORDER)) == 0) {
-		rgb_color debugColor = {255, 0, 0, 255}; // RED for identification
-		view->SetHighColor(debugColor);
+		view->SetHighColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 		view->FillRect(rect);
 		view->PopState();
 		return;
