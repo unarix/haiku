@@ -638,12 +638,7 @@ FlatControlLook::DrawScrollBarThumb(BView* view, BRect& rect,
 		view->FillRect(rect);
 
 		_DrawNonFlatButtonBackground(view, rect, updateRect, clipping, kRadius + 1, kRadius + 1,
-			kRadius + 1, kRadius + 1, thumbColor, false, flags, B_ALL_BORDERS, orientation);
-
-		// draw a darker border around the thumb
-		rgb_color thumbBorder = tint_color(thumbColor, 1.2);
-		view->SetHighColor(thumbBorder);
-		view->StrokeRoundRect(rect, kRadius + 1, kRadius + 1);
+			kRadius + 1, kRadius + 1, tint_color(thumbColor, 1.2), false, flags, B_ALL_BORDERS, orientation);
 	} else {
 		DrawScrollBarBackground(view, rect, updateRect, base_panel, flags, orientation);
 	}
