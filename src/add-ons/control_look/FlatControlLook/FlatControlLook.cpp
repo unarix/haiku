@@ -639,6 +639,11 @@ FlatControlLook::DrawScrollBarThumb(BView* view, BRect& rect,
 
 		_DrawNonFlatButtonBackground(view, rect, updateRect, clipping, kRadius + 1, kRadius + 1,
 			kRadius + 1, kRadius + 1, thumbColor, false, flags, B_ALL_BORDERS, orientation);
+
+		// draw a darker border around the thumb
+		rgb_color thumbBorder = tint_color(thumbColor, 1.2);
+		view->SetHighColor(thumbBorder);
+		view->StrokeRoundRect(rect, kRadius + 1, kRadius + 1);
 	} else {
 		DrawScrollBarBackground(view, rect, updateRect, base_panel, flags, orientation);
 	}
@@ -1885,11 +1890,10 @@ FlatControlLook::_DrawNonFlatButtonBackground(BView* view, BRect& rect,
 
 		view->EndLineArray();
 	} else {
-		rgb_color frameDark = tint_color(buttonBgColor, 1.2);
 		_DrawFrame(view, rect,
-			frameDark, frameDark,
-			frameDark, frameDark,
-			frameDark, frameDark, borders);
+			buttonBgColor, buttonBgColor,
+			buttonBgColor, buttonBgColor,
+			buttonBgColor, buttonBgColor, borders);
 	}
 
 	if (popupIndicator) {
