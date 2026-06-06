@@ -1563,6 +1563,12 @@ FlatControlLook::_DrawButtonFrame(BView* view, BRect& rect,
 	if (!ShouldDraw(view, rect, updateRect))
 		return;
 
+	// Column header buttons (partial borders, no left/right): skip frame entirely
+	if (borders != B_ALL_BORDERS && borders != 0
+		&& (borders & (B_LEFT_BORDER | B_RIGHT_BORDER)) == 0) {
+		return;
+	}
+
 	rgb_color customColor = ui_color(B_PANEL_BACKGROUND_COLOR);
 	rgb_color customColor2 = tint_color(ui_color(B_CONTROL_TEXT_COLOR), 0.55);
 
