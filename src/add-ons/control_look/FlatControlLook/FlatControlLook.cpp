@@ -2238,7 +2238,7 @@ FlatControlLook::_EdgeShadowColor(const rgb_color& base, float contrast,
 rgb_color
 FlatControlLook::_BevelLightColor(const rgb_color& base, uint32 flags)
 {
-	rgb_color bevelLightColor = tint_color(base, 1.0);
+	rgb_color bevelLightColor = tint_color(base, 1.2);
 	return bevelLightColor;
 }
 
@@ -2246,7 +2246,7 @@ FlatControlLook::_BevelLightColor(const rgb_color& base, uint32 flags)
 rgb_color
 FlatControlLook::_BevelShadowColor(const rgb_color& base, uint32 flags)
 {
-	rgb_color bevelShadowColor = tint_color(base, 1.0);
+	rgb_color bevelShadowColor = tint_color(base, 1.2);
 	return bevelShadowColor;
 }
 
