@@ -1885,10 +1885,11 @@ FlatControlLook::_DrawNonFlatButtonBackground(BView* view, BRect& rect,
 
 		view->EndLineArray();
 	} else {
+		rgb_color borderDark = tint_color(buttonBgColor, 1.2);
 		_DrawFrame(view, rect,
-			buttonBgColor, buttonBgColor,
-			buttonBgColor, buttonBgColor,
-			buttonBgColor, buttonBgColor, borders);
+			borderDark, borderDark,
+			borderDark, borderDark,
+			borderDark, borderDark, borders);
 	}
 
 	if (popupIndicator) {
