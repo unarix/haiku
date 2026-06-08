@@ -318,15 +318,15 @@ FlatControlLook::DrawCheckBox(BView* view, BRect& rect, const BRect& updateRect,
 		customFrameColor = tint_color(ui_color(B_CONTROL_TEXT_COLOR), 1.55);
 
 	rgb_color borderColor = (customBaseColor.IsDark())
-		? tint_color(ui_color(B_DOCUMENT_BACKGROUND_COLOR), 0.9)
-		: tint_color(ui_color(B_DOCUMENT_BACKGROUND_COLOR), 1.2);
+		? tint_color(ui_color(B_CONTROL_TEXT_COLOR), 1.55)
+		: tint_color(ui_color(B_CONTROL_TEXT_COLOR), 0.55);
 
 	rgb_color navigationColor = ui_color(B_KEYBOARD_NAVIGATION_COLOR);
 
 	if ((flags & B_FOCUSED) != 0)
 		borderColor = navigationColor;
 	else if ((flags & B_CLICKED) != 0)
-		borderColor = tint_color(customFrameColor, 1.2);
+		borderColor = tint_color(borderColor, 1.2);
 
 	float radius = 3.0f;
 
@@ -343,9 +343,8 @@ FlatControlLook::DrawCheckBox(BView* view, BRect& rect, const BRect& updateRect,
 	if (_RadioButtonAndCheckBoxMarkColor(customBaseColor, markColor, flags)) {
 		view->SetHighColor(customMarkColor);
 
-		BFont font;
-		view->GetFont(&font);
-		float inset = std::max(2.0f, roundf(font.Size() / 6));
+		// Inset more to avoid hitting the border
+		float inset = std::max(3.0f, roundf(rect.Width() / 4));
 		rect.InsetBy(inset, inset);
 
 		float penSize = std::max(1.0f, ceilf(rect.Width() / 3.5f));
