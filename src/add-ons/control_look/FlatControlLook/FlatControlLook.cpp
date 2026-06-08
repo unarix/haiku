@@ -611,7 +611,7 @@ FlatControlLook::DrawScrollBarThumb(BView* view, BRect& rect,
 	bool isEnabled = (flags & B_DISABLED) == 0;
 
 	// colors
-	rgb_color thumbColor = tint_color(ui_color(B_SCROLL_BAR_THUMB_COLOR), 1.09);
+	rgb_color thumbColor = ui_color(B_SCROLL_BAR_THUMB_COLOR);
 	rgb_color base_panel = ui_color(B_PANEL_BACKGROUND_COLOR);
 
 	rgb_color light, dark, dark1, dark2;
@@ -648,11 +648,11 @@ FlatControlLook::DrawScrollBarThumb(BView* view, BRect& rect,
 	// draw knob style
 	if (knobStyle != B_KNOB_NONE && isEnabled) {
 		rgb_color knobLight = isEnabled
-			? tint_color(thumbColor, 0.4)
+			? tint_color(thumbColor, 0.95)
 			: tint_color(base_panel, 1.1);
 		rgb_color knobDark = isEnabled
-			? tint_color(thumbColor, 1.6)
-			: tint_color(base_panel, 1.2);
+			? tint_color(thumbColor, 1.5)
+			: tint_color(base_panel, 1.3);
 
 		if (knobStyle == B_KNOB_DOTS) {
 			// draw dots on the scroll bar thumb
@@ -1885,7 +1885,7 @@ FlatControlLook::_DrawNonFlatButtonBackground(BView* view, BRect& rect,
 
 		view->EndLineArray();
 	} else {
-		rgb_color borderDark = tint_color(buttonBgColor, 1.2);
+		rgb_color borderDark = (buttonBgColor.IsDark())? tint_color(buttonBgColor, 0.99): tint_color(buttonBgColor, 1.1);
 		_DrawFrame(view, rect,
 			borderDark, borderDark,
 			borderDark, borderDark,
@@ -2239,7 +2239,8 @@ FlatControlLook::_EdgeShadowColor(const rgb_color& base, float contrast,
 rgb_color
 FlatControlLook::_BevelLightColor(const rgb_color& base, uint32 flags)
 {
-	rgb_color bevelLightColor = tint_color(base, 1.2);
+	rgb_color bevelLightColor = (base.IsDark()) ? tint_color(base, 0.99) : tint_color(base, 1.1);
+
 	return bevelLightColor;
 }
 
@@ -2247,7 +2248,8 @@ FlatControlLook::_BevelLightColor(const rgb_color& base, uint32 flags)
 rgb_color
 FlatControlLook::_BevelShadowColor(const rgb_color& base, uint32 flags)
 {
-	rgb_color bevelShadowColor = tint_color(base, 1.2);
+	rgb_color bevelShadowColor = (base.IsDark()) ? tint_color(base, 0.99) : tint_color(base, 1.1);
+
 	return bevelShadowColor;
 }
 
