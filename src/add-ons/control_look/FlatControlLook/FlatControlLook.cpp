@@ -455,7 +455,39 @@ FlatControlLook::DrawScrollBarBorder(BView* view, BRect rect,
 	bool isEnabled = (flags & B_DISABLED) == 0;
 	bool isFocused = (flags & B_FOCUSED) != 0;
 
-	// No border for modern flat look
+	// Use base color without tint so the border blends with the background
+	view->SetHighColor(base);
+
+	if (isEnabled && isFocused) {
+		rgb_color borderColor = base;
+
+		view->BeginLineArray(4);
+
+		view->AddLine(BPoint(rect.left + 1, rect.bottom),
+			BPoint(rect.right, rect.bottom), borderColor);
+		view->AddLine(BPoint(rect.right, rect.top + 1),
+			BPoint(rect.right, rect.bottom - 1), borderColor);
+
+		if (orientation == B_HORIZONTAL) {
+			view->AddLine(BPoint(rect.left, rect.top + 1),
+				BPoint(rect.left, rect.bottom), borderColor);
+		} else {
+			view->AddLine(BPoint(rect.left, rect.top),
+				BPoint(rect.left, rect.bottom), borderColor);
+		}
+
+		if (orientation == B_HORIZONTAL) {
+			view->AddLine(BPoint(rect.left, rect.top),
+				BPoint(rect.right, rect.top), borderColor);
+		} else {
+			view->AddLine(BPoint(rect.left + 1, rect.top),
+				BPoint(rect.right, rect.top), borderColor);
+		}
+
+		view->EndLineArray();
+	} else
+		view->StrokeRect(rect);
+
 	view->PopState();
 }
 
@@ -524,10 +556,22 @@ FlatControlLook::DrawScrollBarBackground(BView* view, BRect& rect,
 	// set clipping constraints to rect
 	view->ClipToRect(rect);
 
-	// flat solid background, no gradient
+	bool isEnabled = (flags & B_DISABLED) == 0;
+
+	// fill background with flat color (no gradient)
 	view->SetDrawingMode(B_OP_COPY);
-	view->SetHighColor(base);
-	view->FillRect(rect);
+
+	if (orientation == B_HORIZONTAL) {
+		if (rect.Width() >= 0) {
+			view->SetHighColor(base);
+			view->FillRect(rect);
+		}
+	} else {
+		if (rect.Height() >= 0) {
+			view->SetHighColor(base);
+			view->FillRect(rect);
+		}
+	}
 
 	view->PopState();
 }
@@ -747,14 +791,18 @@ FlatControlLook::DrawScrollViewFrame(BView* view, BRect& rect,
 		borders &= ~(B_RIGHT_BORDER | B_BOTTOM_BORDER);
 	}
 
-	rgb_color scrollbarFrameColor = base;
+	rgb_color scrollbarFrameColor = tint_color(base, 1.2);
 
-	if (borderStyle == B_FANCY_BORDER) {
-		// No outer resessed frame for flat look
+	if (borderStyle == B_FANCY_BORDER)
+		_DrawOuterResessedFrame(view, rect, base, 1.0, 1.0, flags, borders);
+
+	if ((flags & B_FOCUSED) != 0) {
+		_DrawFrame(view, rect, scrollbarFrameColor, scrollbarFrameColor,
+			scrollbarFrameColor, scrollbarFrameColor, borders);
+	} else {
+		_DrawFrame(view, rect, scrollbarFrameColor, scrollbarFrameColor,
+			scrollbarFrameColor, scrollbarFrameColor, borders);
 	}
-
-	_DrawFrame(view, rect, scrollbarFrameColor, scrollbarFrameColor,
-		scrollbarFrameColor, scrollbarFrameColor, borders);
 
 	if (excludeScrollCorner) {
 		horizontalScrollBarFrame.InsetBy(-1, -1);
@@ -763,6 +811,8 @@ FlatControlLook::DrawScrollViewFrame(BView* view, BRect& rect,
 		horizontalScrollBarFrame.top += 2;
 		borders = _borders;
 		borders &= ~B_TOP_BORDER;
+		_DrawOuterResessedFrame(view, horizontalScrollBarFrame, base,
+			1.0, 1.0, flags, borders);
 		_DrawFrame(view, horizontalScrollBarFrame, scrollbarFrameColor,
 			scrollbarFrameColor, scrollbarFrameColor, scrollbarFrameColor,
 			borders);
@@ -773,6 +823,8 @@ FlatControlLook::DrawScrollViewFrame(BView* view, BRect& rect,
 		verticalScrollBarFrame.left += 2;
 		borders = _borders;
 		borders &= ~B_LEFT_BORDER;
+		_DrawOuterResessedFrame(view, verticalScrollBarFrame, base,
+			1.0, 1.0, flags, borders);
 		_DrawFrame(view, verticalScrollBarFrame, scrollbarFrameColor,
 			scrollbarFrameColor, scrollbarFrameColor, scrollbarFrameColor,
 			borders);
