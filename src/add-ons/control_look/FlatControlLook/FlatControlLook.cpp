@@ -455,41 +455,7 @@ FlatControlLook::DrawScrollBarBorder(BView* view, BRect rect,
 	bool isEnabled = (flags & B_DISABLED) == 0;
 	bool isFocused = (flags & B_FOCUSED) != 0;
 
-	view->SetHighColor(tint_color(base, 1.2));
-
-	// stroke a line around the entire scrollbar
-	// take care of border highlighting, scroll target is focus view
-	if (isEnabled && isFocused) {
-		rgb_color borderColor = tint_color(base, 1.2);
-		rgb_color highlightColor = tint_color(base, 1.2);
-
-		view->BeginLineArray(4);
-
-		view->AddLine(BPoint(rect.left + 1, rect.bottom),
-			BPoint(rect.right, rect.bottom), borderColor);
-		view->AddLine(BPoint(rect.right, rect.top + 1),
-			BPoint(rect.right, rect.bottom - 1), borderColor);
-
-		if (orientation == B_HORIZONTAL) {
-			view->AddLine(BPoint(rect.left, rect.top + 1),
-				BPoint(rect.left, rect.bottom), borderColor);
-		} else {
-			view->AddLine(BPoint(rect.left, rect.top),
-				BPoint(rect.left, rect.bottom), highlightColor);
-		}
-
-		if (orientation == B_HORIZONTAL) {
-			view->AddLine(BPoint(rect.left, rect.top),
-				BPoint(rect.right, rect.top), highlightColor);
-		} else {
-			view->AddLine(BPoint(rect.left + 1, rect.top),
-				BPoint(rect.right, rect.top), borderColor);
-		}
-
-		view->EndLineArray();
-	} else
-		view->StrokeRect(rect);
-
+	// No border for modern flat look
 	view->PopState();
 }
 
@@ -558,29 +524,10 @@ FlatControlLook::DrawScrollBarBackground(BView* view, BRect& rect,
 	// set clipping constraints to rect
 	view->ClipToRect(rect);
 
-	bool isEnabled = (flags & B_DISABLED) == 0;
-
-	// fill background, we'll draw arrows and thumb on top
+	// flat solid background, no gradient
 	view->SetDrawingMode(B_OP_COPY);
-
-	float gradient1Tint = 1.08;
-	float gradient2Tint = 0.95;
-
-	if (orientation == B_HORIZONTAL) {
-		// dark vertical line on left edge
-		// fill
-		if (rect.Width() >= 0) {
-			_FillGradient(view, rect, base, gradient1Tint, gradient2Tint,
-				orientation);
-		}
-	} else {
-		// dark vertical line on top edge
-		// fill
-		if (rect.Height() >= 0) {
-			_FillGradient(view, rect, base, gradient1Tint, gradient2Tint,
-				orientation);
-		}
-	}
+	view->SetHighColor(base);
+	view->FillRect(rect);
 
 	view->PopState();
 }
