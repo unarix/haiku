@@ -749,8 +749,9 @@ FlatControlLook::DrawScrollViewFrame(BView* view, BRect& rect,
 
 	rgb_color scrollbarFrameColor = base;
 
-	if (borderStyle == B_FANCY_BORDER)
-		_DrawOuterResessedFrame(view, rect, base, 1.0, 1.0, flags, borders);
+	if (borderStyle == B_FANCY_BORDER) {
+		// No outer resessed frame for flat look
+	}
 
 	_DrawFrame(view, rect, scrollbarFrameColor, scrollbarFrameColor,
 		scrollbarFrameColor, scrollbarFrameColor, borders);
@@ -762,8 +763,6 @@ FlatControlLook::DrawScrollViewFrame(BView* view, BRect& rect,
 		horizontalScrollBarFrame.top += 2;
 		borders = _borders;
 		borders &= ~B_TOP_BORDER;
-		_DrawOuterResessedFrame(view, horizontalScrollBarFrame, base,
-			1.0, 1.0, flags, borders);
 		_DrawFrame(view, horizontalScrollBarFrame, scrollbarFrameColor,
 			scrollbarFrameColor, scrollbarFrameColor, scrollbarFrameColor,
 			borders);
@@ -774,8 +773,6 @@ FlatControlLook::DrawScrollViewFrame(BView* view, BRect& rect,
 		verticalScrollBarFrame.left += 2;
 		borders = _borders;
 		borders &= ~B_LEFT_BORDER;
-		_DrawOuterResessedFrame(view, verticalScrollBarFrame, base,
-			1.0, 1.0, flags, borders);
 		_DrawFrame(view, verticalScrollBarFrame, scrollbarFrameColor,
 			scrollbarFrameColor, scrollbarFrameColor, scrollbarFrameColor,
 			borders);
