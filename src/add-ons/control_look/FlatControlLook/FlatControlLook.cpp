@@ -791,7 +791,7 @@ FlatControlLook::DrawScrollViewFrame(BView* view, BRect& rect,
 		borders &= ~(B_RIGHT_BORDER | B_BOTTOM_BORDER);
 	}
 
-	rgb_color scrollbarFrameColor = tint_color(base, 1.2);
+	rgb_color scrollbarFrameColor = base;
 
 	if (borderStyle == B_FANCY_BORDER)
 		_DrawOuterResessedFrame(view, rect, base, 1.0, 1.0, flags, borders);
