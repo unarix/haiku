@@ -317,35 +317,28 @@ FlatControlLook::DrawCheckBox(BView* view, BRect& rect, const BRect& updateRect,
 	if (customBaseColor.IsDark())
 		customFrameColor = tint_color(ui_color(B_CONTROL_TEXT_COLOR), 1.55);
 
-	rgb_color dark1BorderColor = (customBaseColor.IsDark())
+	rgb_color borderColor = (customBaseColor.IsDark())
 		? tint_color(ui_color(B_DOCUMENT_BACKGROUND_COLOR), 0.9)
 		: tint_color(ui_color(B_DOCUMENT_BACKGROUND_COLOR), 1.2);
 
-	rgb_color dark2BorderColor = dark1BorderColor;
 	rgb_color navigationColor = ui_color(B_KEYBOARD_NAVIGATION_COLOR);
 
-	if ((flags & B_DISABLED) != 0) {
-		_DrawOuterResessedFrame(view, rect, customFrameColor, 0.0, 1.0, flags);
-	} else if ((flags & B_CLICKED) != 0) {
-		_DrawOuterResessedFrame(view, rect, ui_color(B_CONTROL_TEXT_COLOR), 0.0, 1.0, flags);
-	} else {
-		_DrawOuterResessedFrame(view, rect, customFrameColor, 0.0, 1.0, flags);
-	}
+	if ((flags & B_FOCUSED) != 0)
+		borderColor = navigationColor;
+	else if ((flags & B_CLICKED) != 0)
+		borderColor = tint_color(customFrameColor, 1.2);
 
-	if ((flags & B_FOCUSED) != 0) {
-		dark1BorderColor = navigationColor;
-		dark2BorderColor = navigationColor;
-	}
+	float radius = 3.0f;
 
-	_DrawFrame(view, rect,
-		dark1BorderColor, dark1BorderColor,
-		dark2BorderColor, dark2BorderColor);
+	// fill background
+	view->SetHighColor(customBaseColor);
+	view->FillRoundRect(rect, radius, radius);
 
-	if ((flags & B_DISABLED) != 0)
-		_FillGradient(view, rect, customBaseColor, 1.0, 1.0);
-	else
-		_FillGradient(view, rect, customBaseColor, 1.0, 1.0);
+	// draw border
+	view->SetHighColor(borderColor);
+	view->StrokeRoundRect(rect, radius, radius);
 
+	// draw check mark
 	rgb_color markColor;
 	if (_RadioButtonAndCheckBoxMarkColor(customBaseColor, markColor, flags)) {
 		view->SetHighColor(customMarkColor);
