@@ -296,9 +296,17 @@ FlatDecorator::_DrawFrame(BRect rect)
 				_GetComponentColors(COMPONENT_LEFT_BORDER, colors, fTopTab);
 
 				for (int8 i = 0; i < 5; i++) {
+					// Outermost line (i=0) stops 2px before bottom for rounded corner
+					float endY = r.bottom - i;
+					if (i == 0)
+						endY = r.bottom - 2;
+
 					fDrawingEngine->StrokeLine(BPoint(r.left + i, r.top + i),
-						BPoint(r.left + i, r.bottom - i), colors[i]);
+						BPoint(r.left + i, endY), colors[i]);
 				}
+				// rounded bottom-left corner: diagonal pixel
+				fDrawingEngine->StrokeLine(BPoint(r.left + 1, r.bottom - 1),
+					BPoint(r.left + 1, r.bottom - 1), colors[0]);
 				// redraw line to be part of tab title
 				fDrawingEngine->StrokeLine(BPoint(r.left, r.top),
 					BPoint(r.left, r.top + 4), colors[6]);
@@ -310,8 +318,19 @@ FlatDecorator::_DrawFrame(BRect rect)
 				_GetComponentColors(COMPONENT_BOTTOM_BORDER, colors, fTopTab);
 
 				for (int8 i = 0; i < 5; i++) {
-					fDrawingEngine->StrokeLine(BPoint(r.left + i, r.bottom - i),
-						BPoint(r.right - i, r.bottom - i),
+					// Outermost line (i=0) is shortened on both sides for rounded corners
+					float leftStart = r.left + i;
+					float rightEnd = r.right - i;
+					if (i == 0) {
+						leftStart = r.left + 2;
+						rightEnd = r.right - 2;
+					} else if (i == 1) {
+						leftStart = r.left + 2;  // leave room for diagonal pixel
+						rightEnd = r.right - 2;
+					}
+
+					fDrawingEngine->StrokeLine(BPoint(leftStart, r.bottom - i),
+						BPoint(rightEnd, r.bottom - i),
 						colors[i]);
 				}
 			}
@@ -321,19 +340,25 @@ FlatDecorator::_DrawFrame(BRect rect)
 				_GetComponentColors(COMPONENT_RIGHT_BORDER, colors, fTopTab);
 
 				for (int8 i = 0; i < 5; i++) {
-					// Only the outermost line (i=0) needs to start lower
-					// for the rounded corner. Inner lines are unaffected.
+					// Outermost line (i=0) starts lower (top-right corner)
+					// and ends higher (bottom-right corner)
 					float startY = r.top + i;
-					if (i == 0)
-						startY = r.top + 2; // skip the 2 excluded pixels
+					float endY = r.bottom - i;
+					if (i == 0) {
+						startY = r.top + 2;
+						endY = r.bottom - 2;
+					}
 
 					fDrawingEngine->StrokeLine(BPoint(r.right - i, startY),
-						BPoint(r.right - i, r.bottom - i),
+						BPoint(r.right - i, endY),
 						colors[i]);
 				}
-				// rounded top-right corner: diagonal pixel for outermost border
+				// rounded top-right corner: diagonal pixel
 				fDrawingEngine->StrokeLine(BPoint(r.right - 1, r.top + 1),
 					BPoint(r.right - 1, r.top + 1), colors[6]);
+				// rounded bottom-right corner: diagonal pixel
+				fDrawingEngine->StrokeLine(BPoint(r.right - 1, r.bottom - 1),
+					BPoint(r.right - 1, r.bottom - 1), colors[0]);
 				// redraw line to be part of tab title
 				fDrawingEngine->StrokeLine(BPoint(r.right, r.top + 2),
 					BPoint(r.right, r.top + 4), colors[6]);
@@ -595,6 +620,18 @@ FlatDecorator::_GetFootprint(BRegion* region)
 			r.right, r.top));              // row 0: 2px
 		region->Exclude(BRect(r.right, r.top + 1,
 			r.right, r.top + 1));          // row 1: 1px
+
+		// Bottom-left corner of frame: 2px radius
+		region->Exclude(BRect(r.left, r.bottom,
+			r.left + 1, r.bottom));        // bottom row: 2px
+		region->Exclude(BRect(r.left, r.bottom - 1,
+			r.left, r.bottom - 1));        // row above: 1px
+
+		// Bottom-right corner of frame: 2px radius
+		region->Exclude(BRect(r.right - 1, r.bottom,
+			r.right, r.bottom));           // bottom row: 2px
+		region->Exclude(BRect(r.right, r.bottom - 1,
+			r.right, r.bottom - 1));       // row above: 1px
 	}
 }
 
