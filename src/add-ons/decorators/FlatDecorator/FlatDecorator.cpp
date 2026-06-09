@@ -523,19 +523,25 @@ FlatDecorator::_DrawFrame(BRect rect)
 			case B_MODAL_WINDOW_LOOK:
 			case kLeftTitledWindowLook:
 			{
-				if (!rect.Intersects(BRect(fRightBorder.right - kBorderResizeLength,
-					fBottomBorder.bottom - kBorderResizeLength, fRightBorder.right - 1,
-					fBottomBorder.bottom - 1)))
+				if (!rect.Intersects(BRect(
+						fRightBorder.right - fBorderResizeLength,
+						fBottomBorder.bottom - fBorderResizeLength,
+						fRightBorder.right - 1,
+						fBottomBorder.bottom - 1)))
 					break;
 
 				fDrawingEngine->StrokeLine(
-					BPoint(fRightBorder.left, fBottomBorder.bottom - kBorderResizeLength),
-					BPoint(fRightBorder.right - 1, fBottomBorder.bottom - kBorderResizeLength),
-					tint_color(colors[3], 1.2));
+					BPoint(fRightBorder.left,
+						fBottomBorder.bottom - fBorderResizeLength),
+					BPoint(fRightBorder.right - 1,
+						fBottomBorder.bottom - fBorderResizeLength),
+					colors[0]);
 				fDrawingEngine->StrokeLine(
-					BPoint(fRightBorder.right - kBorderResizeLength, fBottomBorder.top),
-					BPoint(fRightBorder.right - kBorderResizeLength, fBottomBorder.bottom - 1),
-					tint_color(colors[3], 1.2));
+					BPoint(fRightBorder.right - fBorderResizeLength,
+						fBottomBorder.top),
+					BPoint(fRightBorder.right - fBorderResizeLength,
+						fBottomBorder.bottom - 1),
+					colors[0]);
 				break;
 			}
 
