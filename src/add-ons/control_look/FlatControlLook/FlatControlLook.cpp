@@ -1443,10 +1443,12 @@ FlatControlLook::DrawBorder(BView* view, BRect& rect, const BRect& updateRect,
 	if (borderStyle == B_NO_BORDER)
 		return;
 
-	rgb_color scrollbarFrameColor = tint_color(base, 1.0);
+	rgb_color borderColor = tint_color(base, 1.1);
+	if (base.IsDark())
+		borderColor = tint_color(base, 0.9);
 
-	_DrawFrame(view, rect, scrollbarFrameColor, scrollbarFrameColor,
-		scrollbarFrameColor, scrollbarFrameColor, borders);
+	_DrawFrame(view, rect, borderColor, borderColor,
+		borderColor, borderColor, borders);
 }
 
 
@@ -1505,15 +1507,10 @@ FlatControlLook::DrawGroupFrame(BView* view, BRect& rect, const BRect& updateRec
 	if (base.IsDark())
 		frameColor = tint_color(base, 0.9);
 
-	if (borders == B_ALL_BORDERS) {
-		// Full frame: draw rounded
-		view->SetHighColor(frameColor);
-		view->StrokeRoundRect(rect, kRadius, kRadius);
-		rect.InsetBy(1, 1);
-	} else {
-		// Partial border (separator line): draw flat
-		_DrawFrame(view, rect, frameColor, frameColor, frameColor, frameColor, borders);
-	}
+	// Draw rounded frame
+	view->SetHighColor(frameColor);
+	view->StrokeRoundRect(rect, kRadius, kRadius);
+	rect.InsetBy(1, 1);
 }
 
 
