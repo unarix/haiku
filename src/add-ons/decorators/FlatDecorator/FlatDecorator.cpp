@@ -543,13 +543,13 @@ FlatDecorator::_DrawFrame(BRect rect)
 				BRect rightFill(fRightBorder.left + 1,
 					fBottomBorder.bottom - kBorderResizeLength + 1,
 					fRightBorder.right - 1, fBottomBorder.bottom - 1);
-				fDrawingEngine->FillRect(rightFill, colors[1]);
+				fDrawingEngine->FillRect(rightFill, colors[3]);
 
 				// Fill the resize area interior (bottom side, right of the vertical line)
 				BRect bottomFill(fRightBorder.right - kBorderResizeLength + 1,
 					fBottomBorder.bottom - 4,
 					fRightBorder.right - 1, fBottomBorder.bottom - 1);
-				fDrawingEngine->FillRect(bottomFill, colors[1]);
+				fDrawingEngine->FillRect(bottomFill, colors[3]);
 
 				break;
 			}
