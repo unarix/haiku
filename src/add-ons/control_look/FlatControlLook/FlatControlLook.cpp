@@ -455,11 +455,13 @@ FlatControlLook::DrawScrollBarBorder(BView* view, BRect rect,
 	bool isEnabled = (flags & B_DISABLED) == 0;
 	bool isFocused = (flags & B_FOCUSED) != 0;
 
-	// Use base color without tint so the border blends with the background
-	view->SetHighColor(base);
+	view->SetHighColor(tint_color(base, 1.2));
 
+	// stroke a line around the entire scrollbar
+	// take care of border highlighting, scroll target is focus view
 	if (isEnabled && isFocused) {
-		rgb_color borderColor = base;
+		rgb_color borderColor = tint_color(base, 1.2);
+		rgb_color highlightColor = tint_color(base, 1.2);
 
 		view->BeginLineArray(4);
 
@@ -473,12 +475,12 @@ FlatControlLook::DrawScrollBarBorder(BView* view, BRect rect,
 				BPoint(rect.left, rect.bottom), borderColor);
 		} else {
 			view->AddLine(BPoint(rect.left, rect.top),
-				BPoint(rect.left, rect.bottom), borderColor);
+				BPoint(rect.left, rect.bottom), highlightColor);
 		}
 
 		if (orientation == B_HORIZONTAL) {
 			view->AddLine(BPoint(rect.left, rect.top),
-				BPoint(rect.right, rect.top), borderColor);
+				BPoint(rect.right, rect.top), highlightColor);
 		} else {
 			view->AddLine(BPoint(rect.left + 1, rect.top),
 				BPoint(rect.right, rect.top), borderColor);
@@ -558,18 +560,25 @@ FlatControlLook::DrawScrollBarBackground(BView* view, BRect& rect,
 
 	bool isEnabled = (flags & B_DISABLED) == 0;
 
-	// fill background with flat color (no gradient)
+	// fill background, we'll draw arrows and thumb on top
 	view->SetDrawingMode(B_OP_COPY);
 
+	float gradient1Tint = 1.08;
+	float gradient2Tint = 0.95;
+
 	if (orientation == B_HORIZONTAL) {
+		// dark vertical line on left edge
+		// fill
 		if (rect.Width() >= 0) {
-			view->SetHighColor(base);
-			view->FillRect(rect);
+			_FillGradient(view, rect, base, gradient1Tint, gradient2Tint,
+				orientation);
 		}
 	} else {
+		// dark vertical line on top edge
+		// fill
 		if (rect.Height() >= 0) {
-			view->SetHighColor(base);
-			view->FillRect(rect);
+			_FillGradient(view, rect, base, gradient1Tint, gradient2Tint,
+				orientation);
 		}
 	}
 
@@ -791,7 +800,7 @@ FlatControlLook::DrawScrollViewFrame(BView* view, BRect& rect,
 		borders &= ~(B_RIGHT_BORDER | B_BOTTOM_BORDER);
 	}
 
-	rgb_color scrollbarFrameColor = base;
+	rgb_color scrollbarFrameColor = tint_color(base, 1.2);
 
 	if (borderStyle == B_FANCY_BORDER)
 		_DrawOuterResessedFrame(view, rect, base, 1.0, 1.0, flags, borders);
