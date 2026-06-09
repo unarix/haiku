@@ -528,29 +528,14 @@ FlatDecorator::_DrawFrame(BRect rect)
 					fBottomBorder.bottom - 1)))
 					break;
 
-				// Draw resize separator lines
-				rgb_color lineColor = tint_color(colors[1], 1.2);
 				fDrawingEngine->StrokeLine(
 					BPoint(fRightBorder.left, fBottomBorder.bottom - kBorderResizeLength),
 					BPoint(fRightBorder.right - 1, fBottomBorder.bottom - kBorderResizeLength),
-					lineColor);
+					tint_color(colors[3], 1.2));
 				fDrawingEngine->StrokeLine(
 					BPoint(fRightBorder.right - kBorderResizeLength, fBottomBorder.top),
 					BPoint(fRightBorder.right - kBorderResizeLength, fBottomBorder.bottom - 1),
-					lineColor);
-
-				// Fill the resize area interior (right side, below the horizontal line)
-				BRect rightFill(fRightBorder.left + 1,
-					fBottomBorder.bottom - kBorderResizeLength + 1,
-					fRightBorder.right - 1, fBottomBorder.bottom - 1);
-				fDrawingEngine->FillRect(rightFill, colors[3]);
-
-				// Fill the resize area interior (bottom side, right of the vertical line)
-				BRect bottomFill(fRightBorder.right - kBorderResizeLength + 1,
-					fBottomBorder.bottom - 4,
-					fRightBorder.right - 1, fBottomBorder.bottom - 1);
-				fDrawingEngine->FillRect(bottomFill, colors[3]);
-
+					tint_color(colors[3], 1.2));
 				break;
 			}
 
