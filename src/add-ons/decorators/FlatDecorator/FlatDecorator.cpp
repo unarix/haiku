@@ -528,29 +528,28 @@ FlatDecorator::_DrawFrame(BRect rect)
 					fBottomBorder.bottom - 1)))
 					break;
 
+				// Draw resize separator lines
+				rgb_color lineColor = tint_color(colors[1], 1.2);
 				fDrawingEngine->StrokeLine(
 					BPoint(fRightBorder.left, fBottomBorder.bottom - kBorderResizeLength),
 					BPoint(fRightBorder.right - 1, fBottomBorder.bottom - kBorderResizeLength),
-					tint_color(colors[1], 1.2));
+					lineColor);
 				fDrawingEngine->StrokeLine(
 					BPoint(fRightBorder.right - kBorderResizeLength, fBottomBorder.top),
 					BPoint(fRightBorder.right - kBorderResizeLength, fBottomBorder.bottom - 1),
-					tint_color(colors[1], 1.2));
+					lineColor);
 
-				// Try to draw line in yellow to the resize place
-				for (int8 i = 1; i < 4; i++) {
-					fDrawingEngine->StrokeLine(
-						BPoint(fRightBorder.left+i, fBottomBorder.bottom - kBorderResizeLength + 1),
-						BPoint(fRightBorder.left+i, fBottomBorder.bottom - 1),
-						tint_color(colors[3], (i * 0.06) + 1));
-				}
-				int rez[] = {4,3,2,1};
-				for (int8 i = 1; i < 4; i++) {
-					fDrawingEngine->StrokeLine(
-						BPoint(fRightBorder.right - kBorderResizeLength + 1, fBottomBorder.bottom - i),
-						BPoint(fRightBorder.right - i, fBottomBorder.bottom - i ),
-						tint_color(colors[3], (rez[i] * 0.06) + 1));
-				}
+				// Fill the resize area interior (right side, below the horizontal line)
+				BRect rightFill(fRightBorder.left + 1,
+					fBottomBorder.bottom - kBorderResizeLength + 1,
+					fRightBorder.right - 1, fBottomBorder.bottom - 1);
+				fDrawingEngine->FillRect(rightFill, colors[1]);
+
+				// Fill the resize area interior (bottom side, right of the vertical line)
+				BRect bottomFill(fRightBorder.right - kBorderResizeLength + 1,
+					fBottomBorder.bottom - 4,
+					fRightBorder.right - 1, fBottomBorder.bottom - 1);
+				fDrawingEngine->FillRect(bottomFill, colors[1]);
 
 				break;
 			}
