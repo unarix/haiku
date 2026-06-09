@@ -1505,8 +1505,10 @@ FlatControlLook::DrawGroupFrame(BView* view, BRect& rect, const BRect& updateRec
 	if (base.IsDark())
 		frameColor = tint_color(base, 0.9);
 
-	// Draws only one flat frame:
-	_DrawFrame(view, rect, frameColor, frameColor, frameColor, frameColor, borders);
+	// Draw rounded frame
+	view->SetHighColor(frameColor);
+	view->StrokeRoundRect(rect, kRadius, kRadius);
+	rect.InsetBy(1, 1);
 }
 
 
