@@ -1505,10 +1505,15 @@ FlatControlLook::DrawGroupFrame(BView* view, BRect& rect, const BRect& updateRec
 	if (base.IsDark())
 		frameColor = tint_color(base, 0.9);
 
-	// Draw rounded frame
-	view->SetHighColor(frameColor);
-	view->StrokeRoundRect(rect, kRadius, kRadius);
-	rect.InsetBy(1, 1);
+	if (borders == B_ALL_BORDERS) {
+		// Full frame: draw rounded
+		view->SetHighColor(frameColor);
+		view->StrokeRoundRect(rect, kRadius, kRadius);
+		rect.InsetBy(1, 1);
+	} else {
+		// Partial border (separator line): draw flat
+		_DrawFrame(view, rect, frameColor, frameColor, frameColor, frameColor, borders);
+	}
 }
 
 

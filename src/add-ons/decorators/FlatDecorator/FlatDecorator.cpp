@@ -491,13 +491,8 @@ FlatDecorator::_DrawFrame(BRect rect)
 
 				BRect bg(x - 15, y - 15, x, y);
 
-				BGradientLinear gradient;
-				gradient.SetStart(bg.LeftTop());
-				gradient.SetEnd(bg.RightBottom());
-				gradient.AddColor(tint_color(colors[1], 1.05), 0);
-				gradient.AddColor(tint_color(colors[1], 1.0), 255);
-
-				fDrawingEngine->FillRect(bg, gradient);
+				// Fill background
+				fDrawingEngine->FillRect(bg, colors[1]);
 
 				fDrawingEngine->StrokeLine(BPoint(x - 15, y - 15),
 					BPoint(x - 15, y - 1), colors[4]);
@@ -507,14 +502,17 @@ FlatDecorator::_DrawFrame(BRect rect)
 				if (fTopTab && !IsFocus(fTopTab))
 					break;
 
-				for (int8 i = 1; i <= 4; i++) {
-					for (int8 j = 1; j <= i; j++) {
-						BPoint pt1(x - (3 * j) + 1, y - (3 * (5 - i)) + 1);
-						BPoint pt2(x - (3 * j) + 2, y - (3 * (5 - i)) + 2);
-						fDrawingEngine->StrokePoint(pt1, tint_color(colors[1], 1.5));
-						fDrawingEngine->StrokePoint(pt2, tint_color(colors[1], 0.75));
-					}
-				}
+				// Draw 3 diagonal lines (modern resize grip)
+				rgb_color gripColor = tint_color(colors[1], 1.4);
+				// line 1 (shortest, top-right)
+				fDrawingEngine->StrokeLine(
+					BPoint(x - 4, y), BPoint(x, y - 4), gripColor);
+				// line 2 (middle)
+				fDrawingEngine->StrokeLine(
+					BPoint(x - 8, y), BPoint(x, y - 8), gripColor);
+				// line 3 (longest, bottom-left)
+				fDrawingEngine->StrokeLine(
+					BPoint(x - 12, y), BPoint(x, y - 12), gripColor);
 				break;
 			}
 
