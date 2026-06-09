@@ -1447,8 +1447,9 @@ FlatControlLook::DrawBorder(BView* view, BRect& rect, const BRect& updateRect,
 	if (base.IsDark())
 		borderColor = tint_color(base, 0.9);
 
-	_DrawFrame(view, rect, borderColor, borderColor,
-		borderColor, borderColor, borders);
+	// Fill the entire border rect to avoid unpainted pixels
+	view->SetHighColor(borderColor);
+	view->FillRect(rect);
 }
 
 

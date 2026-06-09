@@ -505,7 +505,7 @@ FlatDecorator::_DrawFrame(BRect rect)
 				// Draw 3 diagonal lines (modern resize grip)
 				rgb_color gripColor = colors[1].IsDark()
 					? tint_color(colors[1], 0.8)
-					: tint_color(colors[1], 1.2);
+					: tint_color(colors[1], 1.3);
 				// line 1 (shortest, top-right)
 				fDrawingEngine->StrokeLine(
 					BPoint(x - 4, y), BPoint(x, y - 4), gripColor);
