@@ -189,6 +189,13 @@ FlatDecorator::GetComponentColors(Component component, uint8 highlight,
 				_colors[4] = tint_color(fNonFocusFrameColor, 1.1); // borde interior
 				_colors[5] = tint_color(fNonFocusFrameColor, 1.1); // borde menu 1
 			}
+			if (highlight == HIGHLIGHT_RESIZE_BORDER) {
+				for (int32 i = 0; i < 6; i++) {
+					_colors[i].red = std::max((int)_colors[i].red - 80, 0);
+					_colors[i].green = std::max((int)_colors[i].green - 80, 0);
+					_colors[i].blue = 255;
+				}
+			}
 			break;
 		case COMPONENT_RESIZE_CORNER:
 			if (tab && tab->buttonFocus) {
@@ -205,6 +212,13 @@ FlatDecorator::GetComponentColors(Component component, uint8 highlight,
 				_colors[3] = tint_color(fNonFocusFrameColor, B_NO_TINT);
 				_colors[4] = tint_color(fNonFocusFrameColor, 1.1); // borde interior
 				_colors[5] = tint_color(fNonFocusFrameColor, 1.1); // borde menu 1
+			}
+			if (highlight == HIGHLIGHT_RESIZE_BORDER) {
+				for (int32 i = 0; i < 6; i++) {
+					_colors[i].red = std::max((int)_colors[i].red - 80, 0);
+					_colors[i].green = std::max((int)_colors[i].green - 80, 0);
+					_colors[i].blue = 255;
+				}
 			}
 			break;
 		case COMPONENT_LEFT_BORDER:
@@ -225,6 +239,13 @@ FlatDecorator::GetComponentColors(Component component, uint8 highlight,
 				_colors[4] = tint_color(fNonFocusFrameColor, 1.05); // borde interior
 				_colors[5] = tint_color(fNonFocusFrameColor, 1.0); // borde menu 1
 				_colors[6] = tint_color(fNonFocusTabColor, 1.2); // border tab to be part
+			}
+			if (highlight == HIGHLIGHT_RESIZE_BORDER) {
+				for (int32 i = 0; i < 7; i++) {
+					_colors[i].red = std::max((int)_colors[i].red - 80, 0);
+					_colors[i].green = std::max((int)_colors[i].green - 80, 0);
+					_colors[i].blue = 255;
+				}
 			}
 			break;
 		case COMPONENT_BOTTOM_BORDER:
