@@ -1555,8 +1555,8 @@ FlatControlLook::_DrawButtonFrame(BView* view, BRect& rect,
 	if (!ShouldDraw(view, rect, updateRect))
 		return;
 
-	// Column header buttons (partial borders, no left/right): skip frame entirely
-	if (borders != B_ALL_BORDERS && borders != 0
+	// Column header buttons (flat, partial borders, no left/right): skip frame entirely
+	if ((flags & B_FLAT) != 0 && borders != B_ALL_BORDERS && borders != 0
 		&& (borders & (B_LEFT_BORDER | B_RIGHT_BORDER)) == 0) {
 		return;
 	}
