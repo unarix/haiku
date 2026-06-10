@@ -888,14 +888,14 @@ FlatControlLook::DrawSliderBar(BView* view, BRect rect, const BRect& updateRect,
 	view->PushState();
 	view->ClipToRect(rightBarSide);
 
-	DrawSliderBar(view, rect, updateRect, base, leftFillColor, flags, orientation);
+	DrawSliderBar(view, rect, updateRect, base, rightFillColor, flags, orientation);
 
 	view->PopState();
 
 	view->PushState();
 	view->ClipToRect(leftBarSide);
 
-	DrawSliderBar(view, rect, updateRect, base, rightFillColor, flags,
+	DrawSliderBar(view, rect, updateRect, base, leftFillColor, flags,
 		orientation);
 
 	// restore the clipping constraints of the view
@@ -1134,6 +1134,7 @@ FlatControlLook::DrawSliderThumb(BView* view, BRect& rect, const BRect& updateRe
 	}
 
 	view->SetDrawingMode(B_OP_COPY);
+	view->SetHighColor(ui_color(B_PANEL_TEXT_COLOR));
 }
 
 
