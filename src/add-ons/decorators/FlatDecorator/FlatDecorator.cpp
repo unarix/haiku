@@ -567,8 +567,38 @@ FlatDecorator::_GetFootprint(BRegion* region)
 
 	// Exclude the top corner areas of each tab so the desktop/windows
 	// behind show through, creating true rounded corners.
-	if (fTopTab->look == B_NO_BORDER_WINDOW_LOOK
-		|| fTopTab->look == B_BORDERED_WINDOW_LOOK)
+	if (fTopTab->look == B_NO_BORDER_WINDOW_LOOK) {
+		// Round all 4 corners of borderless windows (menus, popups, tooltips)
+		BRect r = fFrame;
+
+		// Top-left
+		region->Exclude(BRect(r.left, r.top,
+			r.left + 1, r.top));
+		region->Exclude(BRect(r.left, r.top + 1,
+			r.left, r.top + 1));
+
+		// Top-right
+		region->Exclude(BRect(r.right - 1, r.top,
+			r.right, r.top));
+		region->Exclude(BRect(r.right, r.top + 1,
+			r.right, r.top + 1));
+
+		// Bottom-left
+		region->Exclude(BRect(r.left, r.bottom,
+			r.left + 1, r.bottom));
+		region->Exclude(BRect(r.left, r.bottom - 1,
+			r.left, r.bottom - 1));
+
+		// Bottom-right
+		region->Exclude(BRect(r.right - 1, r.bottom,
+			r.right, r.bottom));
+		region->Exclude(BRect(r.right, r.bottom - 1,
+			r.right, r.bottom - 1));
+
+		return;
+	}
+
+	if (fTopTab->look == B_BORDERED_WINDOW_LOOK)
 		return;
 
 	for (int32 i = 0; i < fTabList.CountItems(); i++) {
