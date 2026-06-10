@@ -128,18 +128,7 @@ FlatDecorator::GetComponentColors(Component component, uint8 highlight,
 	Decorator::Tab* tab = static_cast<Decorator::Tab*>(_tab);
 	switch (component) {
 		case COMPONENT_TAB:
-			if (highlight != 0) {
-				_colors[COLOR_TAB_FRAME_LIGHT]
-					= tint_color(fFocusTabColor, 1.0);
-				_colors[COLOR_TAB_FRAME_DARK]
-					= tint_color(fFocusTabColor, 1.2);
-				_colors[COLOR_TAB] = tint_color(fFocusTabColor, 0.95);
-				_colors[COLOR_TAB_LIGHT] = fFocusTabColorLight; 
-				_colors[COLOR_TAB_BEVEL] = fFocusTabColorBevel;
-				_colors[COLOR_TAB_SHADOW] = fFocusTabColorShadow;
-				_colors[COLOR_TAB_TEXT] = tint_color(fFocusTextColor, 0.5);
-			} 
-			else if (tab && tab->buttonFocus) {
+			if (tab && tab->buttonFocus) {
 				_colors[COLOR_TAB_FRAME_LIGHT]
 					= tint_color(fFocusTabColor, 1.0);
 				_colors[COLOR_TAB_FRAME_DARK]
@@ -241,7 +230,7 @@ FlatDecorator::GetComponentColors(Component component, uint8 highlight,
 				_colors[6] = tint_color(fNonFocusTabColor, 1.2); // border tab to be part
 			}
 			if (highlight == HIGHLIGHT_RESIZE_BORDER) {
-				for (int32 i = 0; i < 7; i++) {
+				for (int32 i = 0; i < 6; i++) {
 					_colors[i].red = std::max((int)_colors[i].red - 80, 0);
 					_colors[i].green = std::max((int)_colors[i].green - 80, 0);
 					_colors[i].blue = 255;
