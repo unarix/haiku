@@ -1483,13 +1483,13 @@ FlatControlLook::DrawTextControlBorder(BView* view, BRect& rect,
 		view->SetDrawingMode(B_OP_ALPHA);
 
 		_DrawButtonFrame(view, rect, updateRect, kRadius, kRadius, kRadius, kRadius,
-			documentBackground, base, false, false, flags, borders);
+			documentBackground, base, 1.0, 1.0, flags, borders);
 
 		view->SetDrawingMode(oldMode);
 	} else {
 
 		_DrawButtonFrame(view, rect, updateRect, kRadius, kRadius, kRadius, kRadius,
-			documentBackground, base, false, false, flags, borders);
+			documentBackground, base, 1.0, 1.0, flags, borders);
 	}
 }
 
