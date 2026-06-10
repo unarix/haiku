@@ -1562,7 +1562,7 @@ FlatControlLook::_DrawButtonFrame(BView* view, BRect& rect,
 	}
 
 	rgb_color customColor = ui_color(B_PANEL_BACKGROUND_COLOR);
-	rgb_color customColor2 = tint_color(B_PANEL_BACKGROUND_COLOR, 1.3);
+	rgb_color customColor2 = tint_color(ui_color(B_PANEL_BACKGROUND_COLOR), 1.3);
 
 	if (customColor.IsDark())
 		customColor2 = tint_color(ui_color(B_PANEL_BACKGROUND_COLOR), 0.7);
