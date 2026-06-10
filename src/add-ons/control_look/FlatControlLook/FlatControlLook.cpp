@@ -1562,10 +1562,10 @@ FlatControlLook::_DrawButtonFrame(BView* view, BRect& rect,
 	}
 
 	rgb_color customColor = ui_color(B_PANEL_BACKGROUND_COLOR);
-	rgb_color customColor2 = tint_color(ui_color(B_CONTROL_TEXT_COLOR), 0.55);
+	rgb_color customColor2 = tint_color(ui_color(B_CONTROL_TEXT_COLOR), 0.7);
 
 	if (customColor.IsDark())
-		customColor2 = tint_color(ui_color(B_CONTROL_TEXT_COLOR), 1.55);
+		customColor2 = tint_color(ui_color(B_CONTROL_TEXT_COLOR), 1.3);
 
 	// save the clipping constraints of the view
 	view->PushState();
