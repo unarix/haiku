@@ -130,9 +130,9 @@ FlatDecorator::GetComponentColors(Component component, uint8 highlight,
 		case COMPONENT_TAB:
 			if (tab && tab->buttonFocus) {
 				_colors[COLOR_TAB_FRAME_LIGHT]
-					= tint_color(fFocusTabColor, 1.0);
+					= tint_color(fFocusFrameColor, B_DARKEN_2_TINT);
 				_colors[COLOR_TAB_FRAME_DARK]
-					= tint_color(fFocusTabColor, 1.2);
+					= tint_color(fFocusFrameColor, B_DARKEN_3_TINT);
 				_colors[COLOR_TAB] = fFocusTabColor;
 				_colors[COLOR_TAB_LIGHT] = fFocusTabColorLight;
 				_colors[COLOR_TAB_BEVEL] = fFocusTabColorBevel;
@@ -140,9 +140,9 @@ FlatDecorator::GetComponentColors(Component component, uint8 highlight,
 				_colors[COLOR_TAB_TEXT] = fFocusTextColor;
 			} else {
 				_colors[COLOR_TAB_FRAME_LIGHT]
-					= tint_color(fNonFocusTabColor, 1.0);
+					= tint_color(fNonFocusFrameColor, B_DARKEN_2_TINT);
 				_colors[COLOR_TAB_FRAME_DARK]
-					= tint_color(fNonFocusTabColor, 1.2);
+					= tint_color(fNonFocusFrameColor, B_DARKEN_3_TINT);
 				_colors[COLOR_TAB] = fNonFocusTabColor;
 				_colors[COLOR_TAB_LIGHT] = fNonFocusTabColorLight;
 				_colors[COLOR_TAB_BEVEL] = fNonFocusTabColorBevel;
@@ -162,97 +162,28 @@ FlatDecorator::GetComponentColors(Component component, uint8 highlight,
 			}
 			break;
 
-		case COMPONENT_TOP_BORDER:
-			if (tab && tab->buttonFocus) {
-				_colors[0] = tint_color(fFocusTabColor, 1.2); // borde exterior
-				_colors[1] = tint_color(fFocusTabColor, 1.0); // borde top
-				_colors[2] = tint_color(fFocusTabColor, 1.0); // borde top
-				_colors[3] = tint_color(fFocusTabColor, 1.0); // borde top
-				_colors[4] = tint_color(fFocusFrameColor, 1.1); // borde interior
-				_colors[5] = tint_color(fFocusFrameColor, 1.1); // borde menu 1
-			} else {
-				_colors[0] = tint_color(fNonFocusTabColor, 1.2); // borde exterior
-				_colors[1] = tint_color(fNonFocusTabColor, B_NO_TINT);
-				_colors[2] = tint_color(fNonFocusTabColor, B_NO_TINT);
-				_colors[3] = tint_color(fNonFocusTabColor, B_NO_TINT);
-				_colors[4] = tint_color(fNonFocusFrameColor, 1.1); // borde interior
-				_colors[5] = tint_color(fNonFocusFrameColor, 1.1); // borde menu 1
-			}
-			if (highlight == HIGHLIGHT_RESIZE_BORDER) {
-				for (int32 i = 0; i < 6; i++) {
-					_colors[i].red = std::max((int)_colors[i].red - 80, 0);
-					_colors[i].green = std::max((int)_colors[i].green - 80, 0);
-					_colors[i].blue = 255;
-				}
-			}
-			break;
-		case COMPONENT_RESIZE_CORNER:
-			if (tab && tab->buttonFocus) {
-				_colors[0] = tint_color(fFocusFrameColor, 1.25); // borde exterior
-				_colors[1] = tint_color(fFocusFrameColor, 1.0); // borde top
-				_colors[2] = tint_color(fFocusFrameColor, 1.0); // borde top
-				_colors[3] = tint_color(fFocusTabColor, 1.0); // borde top
-				_colors[4] = tint_color(fFocusFrameColor, 1.1); // borde interior
-				_colors[5] = tint_color(fFocusFrameColor, 1.1); // borde menu 1
-			} else {
-				_colors[0] = tint_color(fNonFocusFrameColor, 1.25); // borde exterior
-				_colors[1] = tint_color(fNonFocusFrameColor, B_NO_TINT);
-				_colors[2] = tint_color(fNonFocusFrameColor, B_NO_TINT);
-				_colors[3] = tint_color(fNonFocusFrameColor, B_NO_TINT);
-				_colors[4] = tint_color(fNonFocusFrameColor, 1.1); // borde interior
-				_colors[5] = tint_color(fNonFocusFrameColor, 1.1); // borde menu 1
-			}
-			if (highlight == HIGHLIGHT_RESIZE_BORDER) {
-				for (int32 i = 0; i < 6; i++) {
-					_colors[i].red = std::max((int)_colors[i].red - 80, 0);
-					_colors[i].green = std::max((int)_colors[i].green - 80, 0);
-					_colors[i].blue = 255;
-				}
-			}
-			break;
 		case COMPONENT_LEFT_BORDER:
 		case COMPONENT_RIGHT_BORDER:
-			if (tab && tab->buttonFocus) {
-				_colors[0] = tint_color(fFocusFrameColor, 1.25); // borde exterior
-				_colors[1] = tint_color(fFocusFrameColor, B_NO_TINT);
-				_colors[2] = tint_color(fFocusFrameColor, B_NO_TINT);
-				_colors[3] = tint_color(fFocusFrameColor, B_NO_TINT);
-				_colors[4] = tint_color(fFocusFrameColor, 1.05); // borde interior
-				_colors[5] = tint_color(fFocusFrameColor, 1.1); // borde menu 1
-				_colors[6] = tint_color(fFocusTabColor, 1.2); // border tab to be part
-			} else {
-				_colors[0] = tint_color(fNonFocusFrameColor, 1.25); // borde exterior
-				_colors[1] = tint_color(fNonFocusFrameColor, B_NO_TINT);
-				_colors[2] = tint_color(fNonFocusFrameColor, B_NO_TINT);
-				_colors[3] = tint_color(fNonFocusFrameColor, B_NO_TINT);
-				_colors[4] = tint_color(fNonFocusFrameColor, 1.05); // borde interior
-				_colors[5] = tint_color(fNonFocusFrameColor, 1.0); // borde menu 1
-				_colors[6] = tint_color(fNonFocusTabColor, 1.2); // border tab to be part
-			}
-			if (highlight == HIGHLIGHT_RESIZE_BORDER) {
-				for (int32 i = 0; i < 6; i++) {
-					_colors[i].red = std::max((int)_colors[i].red - 80, 0);
-					_colors[i].green = std::max((int)_colors[i].green - 80, 0);
-					_colors[i].blue = 255;
-				}
-			}
-			break;
+		case COMPONENT_TOP_BORDER:
 		case COMPONENT_BOTTOM_BORDER:
+		case COMPONENT_RESIZE_CORNER:
 		default:
 			if (tab && tab->buttonFocus) {
-				_colors[0] = tint_color(fFocusFrameColor, 1.25); // borde exterior
-				_colors[1] = tint_color(fFocusFrameColor, B_NO_TINT);
-				_colors[2] = tint_color(fFocusFrameColor, B_NO_TINT);
-				_colors[3] = tint_color(fFocusFrameColor, B_NO_TINT);
-				_colors[4] = tint_color(fFocusFrameColor, 1.1); // borde interior
-				_colors[5] = tint_color(fFocusFrameColor, 1.1); // borde menu 1
+				_colors[0] = tint_color(fFocusFrameColor, B_DARKEN_2_TINT);
+				_colors[1] = tint_color(fFocusFrameColor, B_LIGHTEN_2_TINT);
+				_colors[2] = fFocusFrameColor;
+				_colors[3] = tint_color(fFocusFrameColor,
+					(B_DARKEN_1_TINT + B_NO_TINT) / 2);
+				_colors[4] = tint_color(fFocusFrameColor, B_DARKEN_2_TINT);
+				_colors[5] = tint_color(fFocusFrameColor, B_DARKEN_3_TINT);
 			} else {
-				_colors[0] = tint_color(fNonFocusFrameColor, 1.25); // borde exterior
-				_colors[1] = tint_color(fNonFocusFrameColor, B_NO_TINT);
-				_colors[2] = tint_color(fNonFocusFrameColor, B_NO_TINT);
-				_colors[3] = tint_color(fNonFocusFrameColor, B_NO_TINT);
-				_colors[4] = tint_color(fNonFocusFrameColor, 1.1); // borde interior
-				_colors[5] = tint_color(fNonFocusFrameColor, 1.1); // borde menu 1
+				_colors[0] = tint_color(fNonFocusFrameColor, B_DARKEN_2_TINT);
+				_colors[1] = tint_color(fNonFocusFrameColor, B_LIGHTEN_2_TINT);
+				_colors[2] = fNonFocusFrameColor;
+				_colors[3] = tint_color(fNonFocusFrameColor,
+					(B_DARKEN_1_TINT + B_NO_TINT) / 2);
+				_colors[4] = tint_color(fNonFocusFrameColor, B_DARKEN_2_TINT);
+				_colors[5] = tint_color(fNonFocusFrameColor, B_DARKEN_3_TINT);
 			}
 
 			// for the resize-border highlight dye everything bluish.
