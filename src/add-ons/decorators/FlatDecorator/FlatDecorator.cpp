@@ -121,28 +121,11 @@ FlatDecorator::~FlatDecorator()
 	\param highlight The highlight set for the component.
 	\param colors An array of colors to be initialized by the function.
 */
-static inline void
-_ApplyBorderHighlight(TabDecorator::ComponentColors colors, int32 count,
-	uint8 highlight)
-{
-	if (highlight == Decorator::HIGHLIGHT_RESIZE_BORDER
-		|| highlight == FlatDecorator::HIGHLIGHT_STACK_AND_TILE) {
-		for (int32 i = 0; i < count; i++) {
-			colors[i].red = std::max((int)colors[i].red - 80, 0);
-			colors[i].green = std::max((int)colors[i].green - 80, 0);
-			colors[i].blue = 255;
-		}
-	}
-}
-
-
 void
 FlatDecorator::GetComponentColors(Component component, uint8 highlight,
 	ComponentColors _colors, Decorator::Tab* _tab)
 {
 	Decorator::Tab* tab = static_cast<Decorator::Tab*>(_tab);
-	bool focused = tab && tab->buttonFocus;
-
 	switch (component) {
 		case COMPONENT_TAB:
 			if (highlight == HIGHLIGHT_STACK_AND_TILE) {
@@ -155,7 +138,7 @@ FlatDecorator::GetComponentColors(Component component, uint8 highlight,
 				_colors[COLOR_TAB_BEVEL] = fHighlightTabColorBevel;
 				_colors[COLOR_TAB_SHADOW] = fHighlightTabColorShadow;
 				_colors[COLOR_TAB_TEXT] = fFocusTextColor;
-			} else if (focused) {
+			} else if (tab && tab->buttonFocus) {
 				_colors[COLOR_TAB_FRAME_LIGHT]
 					= tint_color(fFocusTabColor, 1.0);
 				_colors[COLOR_TAB_FRAME_DARK]
@@ -183,7 +166,7 @@ FlatDecorator::GetComponentColors(Component component, uint8 highlight,
 			if (highlight == HIGHLIGHT_STACK_AND_TILE) {
 				_colors[COLOR_BUTTON] = fHighlightTabColor;
 				_colors[COLOR_BUTTON_LIGHT] = fHighlightTabColorLight;
-			} else if (focused) {
+			} else if (tab && tab->buttonFocus) {
 				_colors[COLOR_BUTTON] = fFocusTabColor;
 				_colors[COLOR_BUTTON_LIGHT] = fFocusTabColorLight;
 			} else {
@@ -193,74 +176,112 @@ FlatDecorator::GetComponentColors(Component component, uint8 highlight,
 			break;
 
 		case COMPONENT_TOP_BORDER:
-		{
-			rgb_color tabColor = focused ? fFocusTabColor : fNonFocusTabColor;
-			rgb_color frameColor = focused
-				? fFocusFrameColor : fNonFocusFrameColor;
-
-			_colors[0] = tint_color(tabColor, 1.2);
-			_colors[1] = tint_color(tabColor, focused ? 1.0 : B_NO_TINT);
-			_colors[2] = _colors[1];
-			_colors[3] = _colors[1];
-			_colors[4] = tint_color(frameColor, 1.1);
-			_colors[5] = _colors[4];
-
-			_ApplyBorderHighlight(_colors, 6, highlight);
+			if (tab && tab->buttonFocus) {
+				_colors[0] = tint_color(fFocusTabColor, 1.2);
+				_colors[1] = tint_color(fFocusTabColor, 1.0);
+				_colors[2] = tint_color(fFocusTabColor, 1.0);
+				_colors[3] = tint_color(fFocusTabColor, 1.0);
+				_colors[4] = tint_color(fFocusFrameColor, 1.1);
+				_colors[5] = tint_color(fFocusFrameColor, 1.1);
+			} else {
+				_colors[0] = tint_color(fNonFocusTabColor, 1.2);
+				_colors[1] = tint_color(fNonFocusTabColor, B_NO_TINT);
+				_colors[2] = tint_color(fNonFocusTabColor, B_NO_TINT);
+				_colors[3] = tint_color(fNonFocusTabColor, B_NO_TINT);
+				_colors[4] = tint_color(fNonFocusFrameColor, 1.1);
+				_colors[5] = tint_color(fNonFocusFrameColor, 1.1);
+			}
+			if (highlight == HIGHLIGHT_RESIZE_BORDER
+				|| highlight == HIGHLIGHT_STACK_AND_TILE) {
+				for (int32 i = 0; i < 6; i++) {
+					_colors[i].red = std::max((int)_colors[i].red - 80, 0);
+					_colors[i].green = std::max((int)_colors[i].green - 80, 0);
+					_colors[i].blue = 255;
+				}
+			}
 			break;
-		}
 
 		case COMPONENT_RESIZE_CORNER:
-		{
-			rgb_color frameColor = focused
-				? fFocusFrameColor : fNonFocusFrameColor;
-
-			_colors[0] = tint_color(frameColor, 1.25);
-			_colors[1] = tint_color(frameColor, focused ? 1.0 : B_NO_TINT);
-			_colors[2] = _colors[1];
-			_colors[3] = focused
-				? tint_color(fFocusTabColor, 1.0) : _colors[1];
-			_colors[4] = tint_color(frameColor, 1.1);
-			_colors[5] = _colors[4];
-
-			_ApplyBorderHighlight(_colors, 6, highlight);
+			if (tab && tab->buttonFocus) {
+				_colors[0] = tint_color(fFocusFrameColor, 1.25);
+				_colors[1] = tint_color(fFocusFrameColor, 1.0);
+				_colors[2] = tint_color(fFocusFrameColor, 1.0);
+				_colors[3] = tint_color(fFocusTabColor, 1.0);
+				_colors[4] = tint_color(fFocusFrameColor, 1.1);
+				_colors[5] = tint_color(fFocusFrameColor, 1.1);
+			} else {
+				_colors[0] = tint_color(fNonFocusFrameColor, 1.25);
+				_colors[1] = tint_color(fNonFocusFrameColor, B_NO_TINT);
+				_colors[2] = tint_color(fNonFocusFrameColor, B_NO_TINT);
+				_colors[3] = tint_color(fNonFocusFrameColor, B_NO_TINT);
+				_colors[4] = tint_color(fNonFocusFrameColor, 1.1);
+				_colors[5] = tint_color(fNonFocusFrameColor, 1.1);
+			}
+			if (highlight == HIGHLIGHT_RESIZE_BORDER
+				|| highlight == HIGHLIGHT_STACK_AND_TILE) {
+				for (int32 i = 0; i < 6; i++) {
+					_colors[i].red = std::max((int)_colors[i].red - 80, 0);
+					_colors[i].green = std::max((int)_colors[i].green - 80, 0);
+					_colors[i].blue = 255;
+				}
+			}
 			break;
-		}
 
 		case COMPONENT_LEFT_BORDER:
 		case COMPONENT_RIGHT_BORDER:
-		{
-			rgb_color frameColor = focused
-				? fFocusFrameColor : fNonFocusFrameColor;
-			rgb_color tabColor = focused ? fFocusTabColor : fNonFocusTabColor;
-
-			_colors[0] = tint_color(frameColor, 1.25);
-			_colors[1] = tint_color(frameColor, B_NO_TINT);
-			_colors[2] = _colors[1];
-			_colors[3] = _colors[1];
-			_colors[4] = tint_color(frameColor, 1.05);
-			_colors[5] = tint_color(frameColor, focused ? 1.1 : 1.0);
-			_colors[6] = tint_color(tabColor, 1.2);
-
-			_ApplyBorderHighlight(_colors, 7, highlight);
+			if (tab && tab->buttonFocus) {
+				_colors[0] = tint_color(fFocusFrameColor, 1.25);
+				_colors[1] = tint_color(fFocusFrameColor, B_NO_TINT);
+				_colors[2] = tint_color(fFocusFrameColor, B_NO_TINT);
+				_colors[3] = tint_color(fFocusFrameColor, B_NO_TINT);
+				_colors[4] = tint_color(fFocusFrameColor, 1.05);
+				_colors[5] = tint_color(fFocusFrameColor, 1.1);
+				_colors[6] = tint_color(fFocusTabColor, 1.2);
+			} else {
+				_colors[0] = tint_color(fNonFocusFrameColor, 1.25);
+				_colors[1] = tint_color(fNonFocusFrameColor, B_NO_TINT);
+				_colors[2] = tint_color(fNonFocusFrameColor, B_NO_TINT);
+				_colors[3] = tint_color(fNonFocusFrameColor, B_NO_TINT);
+				_colors[4] = tint_color(fNonFocusFrameColor, 1.05);
+				_colors[5] = tint_color(fNonFocusFrameColor, 1.0);
+				_colors[6] = tint_color(fNonFocusTabColor, 1.2);
+			}
+			if (highlight == HIGHLIGHT_RESIZE_BORDER
+				|| highlight == HIGHLIGHT_STACK_AND_TILE) {
+				for (int32 i = 0; i < 7; i++) {
+					_colors[i].red = std::max((int)_colors[i].red - 80, 0);
+					_colors[i].green = std::max((int)_colors[i].green - 80, 0);
+					_colors[i].blue = 255;
+				}
+			}
 			break;
-		}
 
 		case COMPONENT_BOTTOM_BORDER:
 		default:
-		{
-			rgb_color frameColor = focused
-				? fFocusFrameColor : fNonFocusFrameColor;
-
-			_colors[0] = tint_color(frameColor, 1.25);
-			_colors[1] = tint_color(frameColor, B_NO_TINT);
-			_colors[2] = _colors[1];
-			_colors[3] = _colors[1];
-			_colors[4] = tint_color(frameColor, 1.1);
-			_colors[5] = _colors[4];
-
-			_ApplyBorderHighlight(_colors, 6, highlight);
+			if (tab && tab->buttonFocus) {
+				_colors[0] = tint_color(fFocusFrameColor, 1.25);
+				_colors[1] = tint_color(fFocusFrameColor, B_NO_TINT);
+				_colors[2] = tint_color(fFocusFrameColor, B_NO_TINT);
+				_colors[3] = tint_color(fFocusFrameColor, B_NO_TINT);
+				_colors[4] = tint_color(fFocusFrameColor, 1.1);
+				_colors[5] = tint_color(fFocusFrameColor, 1.1);
+			} else {
+				_colors[0] = tint_color(fNonFocusFrameColor, 1.25);
+				_colors[1] = tint_color(fNonFocusFrameColor, B_NO_TINT);
+				_colors[2] = tint_color(fNonFocusFrameColor, B_NO_TINT);
+				_colors[3] = tint_color(fNonFocusFrameColor, B_NO_TINT);
+				_colors[4] = tint_color(fNonFocusFrameColor, 1.1);
+				_colors[5] = tint_color(fNonFocusFrameColor, 1.1);
+			}
+			if (highlight == HIGHLIGHT_RESIZE_BORDER
+				|| highlight == HIGHLIGHT_STACK_AND_TILE) {
+				for (int32 i = 0; i < 6; i++) {
+					_colors[i].red = std::max((int)_colors[i].red - 80, 0);
+					_colors[i].green = std::max((int)_colors[i].green - 80, 0);
+					_colors[i].blue = 255;
+				}
+			}
 			break;
-		}
 	}
 }
 
