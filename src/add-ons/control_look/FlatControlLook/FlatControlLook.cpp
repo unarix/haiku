@@ -1597,7 +1597,7 @@ FlatControlLook::_DrawButtonFrame(BView* view, BRect& rect,
 	// outer edge colors
 	rgb_color edgeLightColor = customColor;
 	rgb_color edgeShadowColor = customColor;
-	rgb_color cornerBgColor = customColor;
+	rgb_color cornerBgColor;
 
 	drawing_mode oldMode = view->DrawingMode();
 
@@ -1612,11 +1612,13 @@ FlatControlLook::_DrawButtonFrame(BView* view, BRect& rect,
 		view->StrokeRoundRect(rect, leftTopRadius, leftTopRadius);
 		rect.InsetBy(1, 1);
 	} else {
-		// Always use transparent corners so the parent view's background
-		// shows through, avoiding visible corner artifacts in Qt apps
-		// and any context where the background isn't B_PANEL_BACKGROUND_COLOR.
-		cornerBgColor.alpha = 0;
-		view->SetDrawingMode(B_OP_ALPHA);
+		// Use the background color passed by the caller so corners blend
+		// correctly with the parent view, even in non-native apps (e.g. Qt).
+		cornerBgColor = background;
+		if ((flags & B_BLEND_FRAME) != 0) {
+			cornerBgColor.alpha = 0;
+			view->SetDrawingMode(B_OP_ALPHA);
+		}
 	}
 
 	// frame colors
