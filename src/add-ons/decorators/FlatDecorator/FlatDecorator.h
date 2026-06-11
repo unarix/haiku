@@ -34,6 +34,11 @@ protected:
 
 class FlatDecorator: public TabDecorator {
 public:
+			enum {
+				HIGHLIGHT_STACK_AND_TILE = HIGHLIGHT_USER_DEFINED
+			};
+
+public:
 								FlatDecorator(DesktopSettings& settings,
 									BRect frame, Desktop* desktop);
 	virtual						~FlatDecorator();
@@ -71,6 +76,11 @@ private:
 			void				_GetComponentColors(Component component,
 									ComponentColors _colors,
 									Decorator::Tab* tab = NULL);
+
+			rgb_color			fHighlightTabColor;
+			rgb_color			fHighlightTabColorLight;
+			rgb_color			fHighlightTabColorBevel;
+			rgb_color			fHighlightTabColorShadow;
 };
 
 

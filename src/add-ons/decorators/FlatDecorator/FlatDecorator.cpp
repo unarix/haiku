@@ -128,16 +128,16 @@ FlatDecorator::GetComponentColors(Component component, uint8 highlight,
 	Decorator::Tab* tab = static_cast<Decorator::Tab*>(_tab);
 	switch (component) {
 		case COMPONENT_TAB:
-			if (highlight != 0) {
+			if (highlight == HIGHLIGHT_STACK_AND_TILE) {
 				_colors[COLOR_TAB_FRAME_LIGHT]
-					= tint_color(fFocusTabColor, 1.0);
+					= tint_color(fHighlightTabColor, 1.0);
 				_colors[COLOR_TAB_FRAME_DARK]
-					= tint_color(fFocusTabColor, 1.2);
-				_colors[COLOR_TAB] = tint_color(fFocusTabColor, 0.95);
-				_colors[COLOR_TAB_LIGHT] = fFocusTabColorLight; 
-				_colors[COLOR_TAB_BEVEL] = fFocusTabColorBevel;
-				_colors[COLOR_TAB_SHADOW] = fFocusTabColorShadow;
-				_colors[COLOR_TAB_TEXT] = tint_color(fFocusTextColor, 0.5);
+					= tint_color(fHighlightTabColor, 1.2);
+				_colors[COLOR_TAB] = fHighlightTabColor;
+				_colors[COLOR_TAB_LIGHT] = fHighlightTabColorLight;
+				_colors[COLOR_TAB_BEVEL] = fHighlightTabColorBevel;
+				_colors[COLOR_TAB_SHADOW] = fHighlightTabColorShadow;
+				_colors[COLOR_TAB_TEXT] = fFocusTextColor;
 			} 
 			else if (tab && tab->buttonFocus) {
 				_colors[COLOR_TAB_FRAME_LIGHT]
@@ -164,7 +164,10 @@ FlatDecorator::GetComponentColors(Component component, uint8 highlight,
 
 		case COMPONENT_CLOSE_BUTTON:
 		case COMPONENT_ZOOM_BUTTON:
-			if (tab && tab->buttonFocus) {
+			if (highlight == HIGHLIGHT_STACK_AND_TILE) {
+				_colors[COLOR_BUTTON] = fHighlightTabColor;
+				_colors[COLOR_BUTTON_LIGHT] = fHighlightTabColorLight;
+			} else if (tab && tab->buttonFocus) {
 				_colors[COLOR_BUTTON] = fFocusTabColor;
 				_colors[COLOR_BUTTON_LIGHT] = fFocusTabColorLight;
 			} else {
@@ -189,7 +192,8 @@ FlatDecorator::GetComponentColors(Component component, uint8 highlight,
 				_colors[4] = tint_color(fNonFocusFrameColor, 1.1); // borde interior
 				_colors[5] = tint_color(fNonFocusFrameColor, 1.1); // borde menu 1
 			}
-			if (highlight == HIGHLIGHT_RESIZE_BORDER) {
+			if (highlight == HIGHLIGHT_RESIZE_BORDER
+				|| highlight == HIGHLIGHT_STACK_AND_TILE) {
 				for (int32 i = 0; i < 6; i++) {
 					_colors[i].red = std::max((int)_colors[i].red - 80, 0);
 					_colors[i].green = std::max((int)_colors[i].green - 80, 0);
@@ -213,7 +217,8 @@ FlatDecorator::GetComponentColors(Component component, uint8 highlight,
 				_colors[4] = tint_color(fNonFocusFrameColor, 1.1); // borde interior
 				_colors[5] = tint_color(fNonFocusFrameColor, 1.1); // borde menu 1
 			}
-			if (highlight == HIGHLIGHT_RESIZE_BORDER) {
+			if (highlight == HIGHLIGHT_RESIZE_BORDER
+				|| highlight == HIGHLIGHT_STACK_AND_TILE) {
 				for (int32 i = 0; i < 6; i++) {
 					_colors[i].red = std::max((int)_colors[i].red - 80, 0);
 					_colors[i].green = std::max((int)_colors[i].green - 80, 0);
@@ -240,7 +245,8 @@ FlatDecorator::GetComponentColors(Component component, uint8 highlight,
 				_colors[5] = tint_color(fNonFocusFrameColor, 1.0); // borde menu 1
 				_colors[6] = tint_color(fNonFocusTabColor, 1.2); // border tab to be part
 			}
-			if (highlight == HIGHLIGHT_RESIZE_BORDER) {
+			if (highlight == HIGHLIGHT_RESIZE_BORDER
+				|| highlight == HIGHLIGHT_STACK_AND_TILE) {
 				for (int32 i = 0; i < 7; i++) {
 					_colors[i].red = std::max((int)_colors[i].red - 80, 0);
 					_colors[i].green = std::max((int)_colors[i].green - 80, 0);
@@ -266,8 +272,9 @@ FlatDecorator::GetComponentColors(Component component, uint8 highlight,
 				_colors[5] = tint_color(fNonFocusFrameColor, 1.1); // borde menu 1
 			}
 
-			// for the resize-border highlight dye everything bluish.
-			if (highlight == HIGHLIGHT_RESIZE_BORDER) {
+			// for the resize-border or stack-and-tile highlight dye everything bluish.
+			if (highlight == HIGHLIGHT_RESIZE_BORDER
+				|| highlight == HIGHLIGHT_STACK_AND_TILE) {
 				for (int32 i = 0; i < 6; i++) {
 					_colors[i].red = std::max((int)_colors[i].red - 80, 0);
 					_colors[i].green = std::max((int)_colors[i].green - 80, 0);
@@ -283,6 +290,14 @@ void
 FlatDecorator::UpdateColors(DesktopSettings& settings)
 {
 	TabDecorator::UpdateColors(settings);
+
+	// Stack and Tile highlight colors
+	fHighlightTabColor = tint_color(fFocusTabColor, B_DARKEN_2_TINT);
+	fHighlightTabColorLight = tint_color(fHighlightTabColor,
+		(B_LIGHTEN_MAX_TINT + B_LIGHTEN_2_TINT) / 2);
+	fHighlightTabColorBevel = tint_color(fHighlightTabColor, B_LIGHTEN_2_TINT);
+	fHighlightTabColorShadow = tint_color(fHighlightTabColor,
+		(B_DARKEN_1_TINT + B_NO_TINT) / 2);
 }
 
 
