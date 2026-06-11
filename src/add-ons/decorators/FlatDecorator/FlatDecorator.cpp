@@ -122,7 +122,8 @@ FlatDecorator::~FlatDecorator()
 	\param colors An array of colors to be initialized by the function.
 */
 static inline void
-_ApplyBorderHighlight(ComponentColors colors, int32 count, uint8 highlight)
+_ApplyBorderHighlight(TabDecorator::ComponentColors colors, int32 count,
+	uint8 highlight)
 {
 	if (highlight == Decorator::HIGHLIGHT_RESIZE_BORDER
 		|| highlight == FlatDecorator::HIGHLIGHT_STACK_AND_TILE) {
