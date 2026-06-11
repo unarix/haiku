@@ -330,6 +330,11 @@ FlatControlLook::DrawCheckBox(BView* view, BRect& rect, const BRect& updateRect,
 
 	float radius = 3.0f;
 
+	// Fill the entire rect with the parent background first so corners
+	// don't show artifacts when the parent has a different background
+	view->SetHighColor(base);
+	view->FillRect(rect);
+
 	// fill background
 	view->SetHighColor(customBaseColor);
 	view->FillRoundRect(rect, radius, radius);
@@ -397,6 +402,11 @@ FlatControlLook::DrawRadioButton(BView* view, BRect& rect, const BRect& updateRe
 	if ((flags & B_FOCUSED) != 0) {
 		borderColor = navigationColor;
 	}
+
+	// Fill the entire rect with the parent background first so corners
+	// outside the ellipse don't show artifacts
+	view->SetHighColor(base);
+	view->FillRect(rect);
 
 	BGradientLinear bevelGradient;
 	bevelGradient.AddColor(bevelShadow, 0);
