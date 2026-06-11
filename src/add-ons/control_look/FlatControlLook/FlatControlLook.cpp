@@ -1612,9 +1612,9 @@ FlatControlLook::_DrawButtonFrame(BView* view, BRect& rect,
 		view->StrokeRoundRect(rect, leftTopRadius, leftTopRadius);
 		rect.InsetBy(1, 1);
 	} else {
-		// Use the background color passed by the caller so corners blend
-		// correctly with the parent view, even in non-native apps (e.g. Qt).
-		cornerBgColor = background;
+		// Use the view's low color as corner background so corners blend
+		// correctly with the actual parent surface, even in non-native apps (e.g. Qt).
+		cornerBgColor = view->LowColor();
 		if ((flags & B_BLEND_FRAME) != 0) {
 			cornerBgColor.alpha = 0;
 			view->SetDrawingMode(B_OP_ALPHA);
