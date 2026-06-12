@@ -1678,15 +1678,9 @@ FlatControlLook::_DrawButtonFrame(BView* view, BRect& rect,
 			view->SetDrawingMode(B_OP_ALPHA);
 		}
 
-		// outer edge (1px inset as StrokeRoundRect)
-		view->SetHighColor(customColor);
-		view->StrokeRoundRect(rect, leftTopRadius, leftTopRadius);
-		rect.InsetBy(1, 1);
-
 		// frame border
 		view->SetHighColor(frameColor);
-		view->StrokeRoundRect(rect, leftTopRadius > 0 ? leftTopRadius - 1 : 0,
-			leftTopRadius > 0 ? leftTopRadius - 1 : 0);
+		view->StrokeRoundRect(rect, leftTopRadius, leftTopRadius);
 		rect.InsetBy(1, 1);
 
 		view->SetDrawingMode(oldMode);
