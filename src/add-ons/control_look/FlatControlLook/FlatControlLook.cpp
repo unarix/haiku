@@ -1594,11 +1594,6 @@ FlatControlLook::_DrawButtonFrame(BView* view, BRect& rect,
 		return;
 	}
 
-	// outer edge colors
-	rgb_color edgeLightColor = customColor;
-	rgb_color edgeShadowColor = customColor;
-	rgb_color cornerBgColor;
-
 	drawing_mode oldMode = view->DrawingMode();
 
 	if ((flags & B_DEFAULT_BUTTON) != 0) {
@@ -1606,111 +1601,95 @@ FlatControlLook::_DrawButtonFrame(BView* view, BRect& rect,
 		rect.InsetBy(1, 1);
 		rect.InsetBy(1, 1);
 
-		cornerBgColor = tint_color(ui_color(B_WINDOW_TAB_COLOR),tint);
+		rgb_color cornerBgColor = tint_color(ui_color(B_WINDOW_TAB_COLOR), tint);
 
-		view->SetHighColor(tint_color(ui_color(B_WINDOW_TAB_COLOR),tint));
+		rgb_color edgeShadowColor = customColor;
+		rgb_color frameLightColor = customColor2;
+		rgb_color frameShadowColor = customColor2;
+
+		view->SetHighColor(cornerBgColor);
 		view->StrokeRoundRect(rect, leftTopRadius, leftTopRadius);
 		rect.InsetBy(1, 1);
+
+		// rounded corners for default button
+		if ((borders & B_LEFT_BORDER) != 0 && (borders & B_TOP_BORDER) != 0
+			&& leftTopRadius > 0) {
+			BRect leftTopCorner(floorf(rect.left), floorf(rect.top),
+				floorf(rect.left + leftTopRadius),
+				floorf(rect.top + leftTopRadius));
+			BRect cornerRect(leftTopCorner);
+			_DrawRoundCornerFrameLeftTop(view, leftTopCorner, updateRect,
+				cornerBgColor, edgeShadowColor, frameLightColor);
+			view->ClipToInverseRect(cornerRect);
+		}
+
+		if ((borders & B_TOP_BORDER) != 0 && (borders & B_RIGHT_BORDER) != 0
+			&& rightTopRadius > 0) {
+			BRect rightTopCorner(floorf(rect.right - rightTopRadius),
+				floorf(rect.top), floorf(rect.right),
+				floorf(rect.top + rightTopRadius));
+			BRect cornerRect(rightTopCorner);
+			_DrawRoundCornerFrameRightTop(view, rightTopCorner, updateRect,
+				cornerBgColor, edgeShadowColor, edgeShadowColor,
+				frameLightColor, frameShadowColor);
+			view->ClipToInverseRect(cornerRect);
+		}
+
+		if ((borders & B_LEFT_BORDER) != 0 && (borders & B_BOTTOM_BORDER) != 0
+			&& leftBottomRadius > 0) {
+			BRect leftBottomCorner(floorf(rect.left),
+				floorf(rect.bottom - leftBottomRadius),
+				floorf(rect.left + leftBottomRadius), floorf(rect.bottom));
+			BRect cornerRect(leftBottomCorner);
+			_DrawRoundCornerFrameLeftBottom(view, leftBottomCorner, updateRect,
+				cornerBgColor, edgeShadowColor, edgeShadowColor,
+				frameLightColor, frameShadowColor);
+			view->ClipToInverseRect(cornerRect);
+		}
+
+		if ((borders & B_RIGHT_BORDER) != 0 && (borders & B_BOTTOM_BORDER) != 0
+			&& rightBottomRadius > 0) {
+			BRect rightBottomCorner(floorf(rect.right - rightBottomRadius),
+				floorf(rect.bottom - rightBottomRadius), floorf(rect.right),
+				floorf(rect.bottom));
+			BRect cornerRect(rightBottomCorner);
+			_DrawRoundCornerFrameRightBottom(view, rightBottomCorner,
+				updateRect, cornerBgColor, edgeShadowColor, frameShadowColor);
+			view->ClipToInverseRect(cornerRect);
+		}
+
+		_DrawOuterResessedFrame(view, rect, customColor, 0, 0, flags, borders);
+
+		view->SetDrawingMode(oldMode);
+
+		_DrawFrame(view, rect, frameLightColor, frameLightColor,
+			frameShadowColor, frameShadowColor, borders);
 	} else {
-		// Use the parent view's actual color for corners, falling back
-		// to the background parameter passed by the caller.
-		if (view->Parent() != NULL)
-			cornerBgColor = view->Parent()->ViewColor();
-		else
-			cornerBgColor = background;
+		// For non-default buttons: use StrokeRoundRect directly to avoid
+		// corner background artifacts in non-native apps (e.g. Qt).
+		rgb_color frameColor = customColor2;
+
+		if ((flags & B_DISABLED) != 0) {
+			float tint = (base.IsDark()) ? 1.1 : 0.9;
+			frameColor = tint_color(customColor2, tint);
+		}
 
 		if ((flags & B_BLEND_FRAME) != 0) {
-			cornerBgColor.alpha = 0;
 			view->SetDrawingMode(B_OP_ALPHA);
 		}
-	}
 
-	// frame colors
-	rgb_color frameLightColor = customColor2;
-	rgb_color frameShadowColor = customColor2;
+		// outer edge (1px inset as StrokeRoundRect)
+		view->SetHighColor(customColor);
+		view->StrokeRoundRect(rect, leftTopRadius, leftTopRadius);
+		rect.InsetBy(1, 1);
 
-	if ((flags & B_DISABLED) != 0) {
-		float tint = (base.IsDark()) ? 1.1 : 0.9;
-		frameLightColor = tint_color(customColor2,tint);
-		frameShadowColor = tint_color(customColor2,tint);
-	}
+		// frame border
+		view->SetHighColor(frameColor);
+		view->StrokeRoundRect(rect, leftTopRadius > 0 ? leftTopRadius - 1 : 0,
+			leftTopRadius > 0 ? leftTopRadius - 1 : 0);
+		rect.InsetBy(1, 1);
 
-	// rounded corners
-
-	if ((borders & B_LEFT_BORDER) != 0 && (borders & B_TOP_BORDER) != 0
-		&& leftTopRadius > 0) {
-		// draw left top rounded corner
-		BRect leftTopCorner(floorf(rect.left), floorf(rect.top),
-			floorf(rect.left + leftTopRadius),
-			floorf(rect.top + leftTopRadius));
-		BRect cornerRect(leftTopCorner);
-		_DrawRoundCornerFrameLeftTop(view, leftTopCorner, updateRect,
-			cornerBgColor, edgeShadowColor, frameLightColor);
-		view->ClipToInverseRect(cornerRect);
-	}
-
-	if ((borders & B_TOP_BORDER) != 0 && (borders & B_RIGHT_BORDER) != 0
-		&& rightTopRadius > 0) {
-		// draw right top rounded corner
-		BRect rightTopCorner(floorf(rect.right - rightTopRadius),
-			floorf(rect.top), floorf(rect.right),
-			floorf(rect.top + rightTopRadius));
-		BRect cornerRect(rightTopCorner);
-		_DrawRoundCornerFrameRightTop(view, rightTopCorner, updateRect,
-			cornerBgColor, edgeShadowColor, edgeLightColor,
-			frameLightColor, frameShadowColor);
-		view->ClipToInverseRect(cornerRect);
-	}
-
-	if ((borders & B_LEFT_BORDER) != 0 && (borders & B_BOTTOM_BORDER) != 0
-		&& leftBottomRadius > 0) {
-		// draw left bottom rounded corner
-		BRect leftBottomCorner(floorf(rect.left),
-			floorf(rect.bottom - leftBottomRadius),
-			floorf(rect.left + leftBottomRadius), floorf(rect.bottom));
-		BRect cornerRect(leftBottomCorner);
-		_DrawRoundCornerFrameLeftBottom(view, leftBottomCorner, updateRect,
-			cornerBgColor, edgeShadowColor, edgeLightColor,
-			frameLightColor, frameShadowColor);
-		view->ClipToInverseRect(cornerRect);
-	}
-
-	if ((borders & B_RIGHT_BORDER) != 0 && (borders & B_BOTTOM_BORDER) != 0
-		&& rightBottomRadius > 0) {
-		// draw right bottom rounded corner
-		BRect rightBottomCorner(floorf(rect.right - rightBottomRadius),
-			floorf(rect.bottom - rightBottomRadius), floorf(rect.right),
-			floorf(rect.bottom));
-		BRect cornerRect(rightBottomCorner);
-		_DrawRoundCornerFrameRightBottom(view, rightBottomCorner,
-			updateRect, cornerBgColor, edgeLightColor, frameShadowColor);
-		view->ClipToInverseRect(cornerRect);
-	}
-
-	// draw outer edge
-	if ((flags & B_DEFAULT_BUTTON) != 0) {
-		_DrawOuterResessedFrame(view, rect, customColor, 0, 0, flags, borders);
-	} else {
-		if ((flags & B_FOCUSED) != 0)
-			_DrawOuterResessedFrame(view, rect, customColor, 0, 0, flags, borders);
-		else
-			_DrawOuterResessedFrame(view, rect, customColor, 0, 0, flags, borders);
-	}
-
-	view->SetDrawingMode(oldMode);
-
-	// draw frame
-	if ((flags & B_BLEND_FRAME) != 0) {
-		drawing_mode oldDrawingMode = view->DrawingMode();
-		view->SetDrawingMode(B_OP_ALPHA);
-
-		_DrawFrame(view, rect, frameLightColor, frameLightColor, frameShadowColor, frameShadowColor,
-			borders);
-
-		view->SetDrawingMode(oldDrawingMode);
-	} else {
-		_DrawFrame(view, rect, frameLightColor, frameLightColor, frameShadowColor, frameShadowColor,
-			borders);
+		view->SetDrawingMode(oldMode);
 	}
 
 	// restore the clipping constraints of the view
