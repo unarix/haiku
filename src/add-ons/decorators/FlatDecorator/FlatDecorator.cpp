@@ -243,7 +243,8 @@ FlatDecorator::GetComponentColors(Component component, uint8 highlight,
 				_colors[2] = tint_color(fNonFocusFrameColor, B_NO_TINT);
 				_colors[3] = tint_color(fNonFocusFrameColor, B_NO_TINT);
 				_colors[4] = tint_color(fNonFocusFrameColor, 1.05);
-				_colors[5] = (rgb_color){255, 0, 0, 255};
+				_colors[5] = tint_color(fNonFocusFrameColor,
+					fNonFocusFrameColor.IsDark() ? 0.8 : 1.3);
 				_colors[6] = tint_color(fNonFocusTabColor, 1.2);
 			}
 			if (highlight == HIGHLIGHT_RESIZE_BORDER
