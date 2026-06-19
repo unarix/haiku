@@ -249,10 +249,8 @@ FlatControlLook::DrawMenuBackground(BView* view, BRect& rect,
 	rgb_color background = tint_color(base, 1.1);
 
 	// inner bevel colors
-	rgb_color bevelColor;
-
-	bevelColor = background.IsDark() ? tint_color(background, 0.8) : 
-		tint_color(background, 1.2);
+	rgb_color bevelColor = background.IsDark() ? tint_color(base, 0.8) : 
+		tint_color(base, 1.2);
 
 	// draw inner bevel
 	_DrawFrame(view, rect,
