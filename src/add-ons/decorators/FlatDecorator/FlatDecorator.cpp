@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2020 Haiku, Inc.
+ * Copyright 2001-2026 Haiku, Inc.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -194,8 +194,8 @@ FlatDecorator::GetComponentColors(Component component, uint8 highlight,
 			if (highlight == HIGHLIGHT_RESIZE_BORDER
 				|| highlight == HIGHLIGHT_STACK_AND_TILE) {
 				for (int32 i = 0; i < 6; i++) {
-					_colors[i].red = std::max((int)_colors[i].red - 80, 0);
-					_colors[i].green = std::max((int)_colors[i].green - 80, 0);
+					_colors[i].red = std::max(static_cast<int>(_colors[i].red) - 80, 0);
+					_colors[i].green = std::max(static_cast<int>(_colors[i].green) - 80, 0);
 					_colors[i].blue = 255;
 				}
 			}
@@ -220,8 +220,8 @@ FlatDecorator::GetComponentColors(Component component, uint8 highlight,
 			if (highlight == HIGHLIGHT_RESIZE_BORDER
 				|| highlight == HIGHLIGHT_STACK_AND_TILE) {
 				for (int32 i = 0; i < 6; i++) {
-					_colors[i].red = std::max((int)_colors[i].red - 80, 0);
-					_colors[i].green = std::max((int)_colors[i].green - 80, 0);
+					_colors[i].red = std::max(static_cast<int>(_colors[i].red) - 80, 0);
+					_colors[i].green = std::max(static_cast<int>(_colors[i].green) - 80, 0);
 					_colors[i].blue = 255;
 				}
 			}
@@ -250,8 +250,8 @@ FlatDecorator::GetComponentColors(Component component, uint8 highlight,
 			if (highlight == HIGHLIGHT_RESIZE_BORDER
 				|| highlight == HIGHLIGHT_STACK_AND_TILE) {
 				for (int32 i = 0; i < 7; i++) {
-					_colors[i].red = std::max((int)_colors[i].red - 80, 0);
-					_colors[i].green = std::max((int)_colors[i].green - 80, 0);
+					_colors[i].red = std::max(static_cast<int>(_colors[i].red) - 80, 0);
+					_colors[i].green = std::max(static_cast<int>(_colors[i].green) - 80, 0);
 					_colors[i].blue = 255;
 				}
 			}
@@ -277,8 +277,8 @@ FlatDecorator::GetComponentColors(Component component, uint8 highlight,
 			if (highlight == HIGHLIGHT_RESIZE_BORDER
 				|| highlight == HIGHLIGHT_STACK_AND_TILE) {
 				for (int32 i = 0; i < 6; i++) {
-					_colors[i].red = std::max((int)_colors[i].red - 80, 0);
-					_colors[i].green = std::max((int)_colors[i].green - 80, 0);
+					_colors[i].red = std::max(static_cast<int>(_colors[i].red) - 80, 0);
+					_colors[i].green = std::max(static_cast<int>(_colors[i].green) - 80, 0);
 					_colors[i].blue = 255;
 				}
 			}
@@ -322,7 +322,7 @@ FlatDecorator::_DrawFrame(BRect rect)
 
 	// Draw the border frame
 	BRect r = BRect(fTopBorder.LeftTop(), fBottomBorder.RightBottom());
-	switch ((int)fTopTab->look) {
+	switch (static_cast<int>(fTopTab->look)) {
 		case B_TITLED_WINDOW_LOOK:
 		case B_DOCUMENT_WINDOW_LOOK:
 		case B_MODAL_WINDOW_LOOK:
@@ -517,7 +517,7 @@ FlatDecorator::_DrawFrame(BRect rect)
 		ComponentColors colors;
 		_GetComponentColors(COMPONENT_RESIZE_CORNER, colors, fTopTab);
 
-		switch ((int)fTopTab->look) {
+		switch (static_cast<int>(fTopTab->look)) {
 			case B_DOCUMENT_WINDOW_LOOK:
 			{
 				if (!rect.Intersects(r))

@@ -1,5 +1,5 @@
 /*
- * Copyright 2021-2025 Haiku, Inc. All rights reserved.
+ * Copyright 2021-2026 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -287,7 +287,9 @@ FlatControlLook::DrawMenuItemBackground(BView* view, BRect& rect,
 		bottomTint = 0.95;
 	}
 
-	rgb_color bevelShadowColor = (base.IsDark()) ? tint_color(selectedColor, 0.8) : tint_color(selectedColor, 1.2);
+	rgb_color bevelShadowColor = base.IsDark()
+		? tint_color(selectedColor, 0.8)
+		: tint_color(selectedColor, 1.2);
 
 	// draw surface edges
 	_DrawFrame(view, rect,
@@ -1874,7 +1876,9 @@ FlatControlLook::_DrawNonFlatButtonBackground(BView* view, BRect& rect,
 
 		view->EndLineArray();
 	} else {
-		rgb_color borderDark = (buttonBgColor.IsDark())? tint_color(buttonBgColor, 0.99): tint_color(buttonBgColor, 1.1);
+		rgb_color borderDark = buttonBgColor.IsDark()
+			? tint_color(buttonBgColor, 0.99)
+			: tint_color(buttonBgColor, 1.1);
 		_DrawFrame(view, rect,
 			borderDark, borderDark,
 			borderDark, borderDark,
