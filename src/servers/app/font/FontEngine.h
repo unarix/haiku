@@ -81,15 +81,15 @@ class FontEngine {
 									unsigned face_index, double size,
 									FT_Encoding char_map,
 									glyph_rendering ren_type,
-									bool hinting,
+									uint8 hintingMode,
 									const void* fontFileBuffer = NULL,
 									const long fontFileBufferSize = 0);
 
 			int					LastError() const
 									{ return fLastError; }
 			unsigned			CountFaces() const;
-			bool				Hinting() const
-									{ return fHinting; }
+			uint8				HintingMode() const
+									{ return fHintingMode; }
 
 
 			uint32				GlyphIndexForGlyphCode(uint32 glyphCode) const;
@@ -131,7 +131,7 @@ class FontEngine {
 			FT_Face				fFace;	  // FreeType font face handle
 
 			glyph_rendering		fGlyphRendering;
-			bool				fHinting;
+			uint8				fHintingMode;
 
 			// members needed to generate individual glyphs according
 			// to glyph rendering type

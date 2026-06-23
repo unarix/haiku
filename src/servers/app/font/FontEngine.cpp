@@ -429,7 +429,7 @@ FontEngine::FontEngine()
 	fFace(NULL),
 
 	fGlyphRendering(glyph_ren_native_gray8),
-	fHinting(true),
+	fHintingMode(HINTING_MODE_ON),
 
 	fDataSize(0),
 	fDataType(glyph_data_invalid),
@@ -485,9 +485,18 @@ FontEngine::GlyphIndexForGlyphCode(uint32 glyphCode) const
 bool
 FontEngine::PrepareGlyph(uint32 glyphIndex)
 {
-	FT_Int32 loadFlags = fHinting ? FT_LOAD_DEFAULT : FT_LOAD_NO_HINTING;
-	loadFlags |= fGlyphRendering == glyph_ren_subpix ?
-		FT_LOAD_TARGET_LCD : FT_LOAD_TARGET_NORMAL;
+	FT_Int32 loadFlags = fHintingMode != HINTING_MODE_OFF
+		? FT_LOAD_DEFAULT : FT_LOAD_NO_HINTING;
+	if (fGlyphRendering == glyph_ren_subpix) {
+		loadFlags |= FT_LOAD_TARGET_LCD;
+	} else if (fHintingMode == HINTING_MODE_LIGHT) {
+		// Light hinting: only hints vertically, preserving the
+		// horizontal advance of the original font design. This gives
+		// crisp glyphs without compressing letter spacing.
+		loadFlags |= FT_LOAD_TARGET_LIGHT;
+	} else {
+		loadFlags |= FT_LOAD_TARGET_NORMAL;
+	}
 
 	// Load unscaled and without hinting to get precise advance values
 	// for B_CHAR_SPACING
@@ -642,13 +651,13 @@ FontEngine::GetKerning(uint32 first, uint32 second, double* x, double* y)
 
 bool
 FontEngine::Init(const char* fontFilePath, unsigned faceIndex, double size,
-	FT_Encoding charMap, glyph_rendering ren_type, bool hinting,
+	FT_Encoding charMap, glyph_rendering ren_type, uint8 hintingMode,
 	const void* fontFileBuffer, const long fontFileBufferSize)
 {
 	if (!fLibraryInitialized)
 		return false;
 
-	fHinting = hinting;
+	fHintingMode = hintingMode;
 
 	fLastError = 0;
 

@@ -38,6 +38,7 @@ static const char* kNoHintingLabel = B_TRANSLATE_MARK("Off");
 static const char* kMonospacedHintingLabel =
 	B_TRANSLATE_MARK("Monospaced fonts only");
 static const char* kFullHintingLabel = B_TRANSLATE_MARK("On");
+static const char* kLightHintingLabel = B_TRANSLATE_MARK("Light");
 
 
 // #pragma mark - private libbe API
@@ -46,7 +47,8 @@ static const char* kFullHintingLabel = B_TRANSLATE_MARK("On");
 enum {
 	HINTING_MODE_OFF = 0,
 	HINTING_MODE_ON,
-	HINTING_MODE_MONOSPACED_ONLY
+	HINTING_MODE_MONOSPACED_ONLY,
+	HINTING_MODE_LIGHT
 };
 
 static const uint8 kDefaultHintingMode = HINTING_MODE_ON;
@@ -232,6 +234,11 @@ AntialiasingSettingsView::_BuildHintingMenu()
 	message->AddInt8("hinting", HINTING_MODE_MONOSPACED_ONLY);
 	fHintingMenu->AddItem(new BMenuItem(
 		B_TRANSLATE_NOCOLLECT(kMonospacedHintingLabel), message));
+
+	message = new BMessage(kMsgSetHinting);
+	message->AddInt8("hinting", HINTING_MODE_LIGHT);
+	fHintingMenu->AddItem(new BMenuItem(
+		B_TRANSLATE_NOCOLLECT(kLightHintingLabel), message));
 }
 
 
@@ -262,6 +269,9 @@ AntialiasingSettingsView::_SetCurrentHinting()
 			break;
 		case HINTING_MODE_MONOSPACED_ONLY:
 			label = kMonospacedHintingLabel;
+			break;
+		case HINTING_MODE_LIGHT:
+			label = kLightHintingLabel;
 			break;
 		default:
 			return;

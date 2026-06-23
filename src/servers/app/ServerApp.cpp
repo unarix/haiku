@@ -3489,7 +3489,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 		case AS_SET_HINTING:
 		{
 			uint8 hinting;
-			if (link.Read<uint8>(&hinting) == B_OK && hinting < 3) {
+			if (link.Read<uint8>(&hinting) == B_OK && hinting <= HINTING_MODE_LIGHT) {
 				LockedDesktopSettings settings(fDesktop);
 				if (hinting != settings.Hinting()) {
 					settings.SetHinting(hinting);

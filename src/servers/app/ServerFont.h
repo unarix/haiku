@@ -117,6 +117,7 @@ class ServerFont {
 			uint16				CharMapCount() const
 									{ return fStyle->CharMapCount(); }
 	inline	bool				Hinting() const;
+	inline	uint8				HintingMode() const;
 
 			status_t			GetGlyphShapes(const char charArray[],
 									int32 numChars, BShape *shapeArray[]) const;
@@ -210,9 +211,28 @@ inline bool ServerFont::Hinting() const
 			return false;
 		default:
 		case HINTING_MODE_ON:
+		case HINTING_MODE_LIGHT:
 			return true;
 		case HINTING_MODE_MONOSPACED_ONLY:
 			return IsFixedWidth();
+	}
+}
+
+
+inline uint8 ServerFont::HintingMode() const
+{
+	switch (gDefaultHintingMode) {
+		case HINTING_MODE_OFF:
+			return HINTING_MODE_OFF;
+		case HINTING_MODE_MONOSPACED_ONLY:
+			if (!IsFixedWidth())
+				return HINTING_MODE_OFF;
+			return HINTING_MODE_ON;
+		case HINTING_MODE_LIGHT:
+			return HINTING_MODE_LIGHT;
+		default:
+		case HINTING_MODE_ON:
+			return HINTING_MODE_ON;
 	}
 }
 
