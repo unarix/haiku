@@ -231,14 +231,14 @@ AntialiasingSettingsView::_BuildHintingMenu()
 		B_TRANSLATE_NOCOLLECT(kFullHintingLabel), message));
 
 	message = new BMessage(kMsgSetHinting);
-	message->AddInt8("hinting", HINTING_MODE_MONOSPACED_ONLY);
-	fHintingMenu->AddItem(new BMenuItem(
-		B_TRANSLATE_NOCOLLECT(kMonospacedHintingLabel), message));
-
-	message = new BMessage(kMsgSetHinting);
 	message->AddInt8("hinting", HINTING_MODE_LIGHT);
 	fHintingMenu->AddItem(new BMenuItem(
 		B_TRANSLATE_NOCOLLECT(kLightHintingLabel), message));
+
+	message = new BMessage(kMsgSetHinting);
+	message->AddInt8("hinting", HINTING_MODE_MONOSPACED_ONLY);
+	fHintingMenu->AddItem(new BMenuItem(
+		B_TRANSLATE_NOCOLLECT(kMonospacedHintingLabel), message));
 }
 
 
