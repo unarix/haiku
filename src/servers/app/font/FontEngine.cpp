@@ -488,9 +488,7 @@ FontEngine::PrepareGlyph(uint32 glyphIndex)
 	FT_Int32 loadFlags = fHintingMode != HINTING_MODE_OFF
 		? FT_LOAD_DEFAULT : FT_LOAD_NO_HINTING;
 	if (fHintingMode == HINTING_MODE_LIGHT) {
-		// Light hinting: only hints vertically, preserving the
-		// horizontal advance of the original font design. This gives
-		// crisp glyphs without compressing letter spacing.
+		// Apply light hinting for not compress letter spacing.
 		loadFlags |= fGlyphRendering == glyph_ren_subpix
 			? FT_LOAD_TARGET_LCD : FT_LOAD_TARGET_LIGHT;
 		loadFlags |= FT_LOAD_FORCE_AUTOHINT;
