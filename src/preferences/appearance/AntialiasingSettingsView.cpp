@@ -296,7 +296,7 @@ AntialiasingSettingsView::_SetCurrentHinting()
 			return;
 	}
 
-	BMenuItem* item = fHintingMenu->FindItem(B_TRANSLATE_NOCOLLECT(label));
+	BMenuItem *item = fHintingMenu->FindItem(B_TRANSLATE_NOCOLLECT(label));
 	if (item != NULL)
 		item->SetMarked(true);
 
