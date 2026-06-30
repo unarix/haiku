@@ -9,6 +9,7 @@
 #include <View.h>
 
 class BBox;
+class BCheckBox;
 class BMenuField;
 class BPopUpMenu;
 class BSlider;
@@ -42,6 +43,7 @@ protected:
 			BPopUpMenu*		fAntialiasingMenu;
 			BMenuField*		fHintingMenuField;
 			BPopUpMenu*		fHintingMenu;
+			BCheckBox*		fMonospacedCheckBox;
 			BSlider*		fAverageWeightControl;
 
 			bool			fSavedSubpixelAntialiasing;
