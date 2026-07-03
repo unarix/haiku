@@ -487,14 +487,18 @@ FontEngine::PrepareGlyph(uint32 glyphIndex)
 {
 	FT_Int32 loadFlags = fHintingMode != HINTING_MODE_OFF
 		? FT_LOAD_DEFAULT : FT_LOAD_NO_HINTING;
-	if (fHintingMode == HINTING_MODE_LIGHT) {
-		// Apply light hinting for not compress letter spacing.
-		loadFlags |= fGlyphRendering == glyph_ren_subpix
-			? FT_LOAD_TARGET_LCD : FT_LOAD_TARGET_LIGHT;
-		loadFlags |= FT_LOAD_FORCE_AUTOHINT;
-	} else if (fGlyphRendering == glyph_ren_subpix) {
+
+	if (fGlyphRendering == glyph_ren_subpix) {
 		loadFlags |= FT_LOAD_TARGET_LCD;
-	} else {
+	}
+	else if (fHintingMode == HINTING_MODE_LIGHT) {
+		// Apply light hinting for not compress letter spacing.
+		// FT_LOAD_FORCE_AUTOHINT for best results
+		loadFlags |= FT_LOAD_TARGET_LIGHT;
+		loadFlags |= FT_LOAD_FORCE_AUTOHINT;
+	}
+	else
+	{
 		loadFlags |= FT_LOAD_TARGET_NORMAL;
 	}
 
