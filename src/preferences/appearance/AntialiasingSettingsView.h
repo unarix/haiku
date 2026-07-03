@@ -8,12 +8,9 @@
 
 #include <View.h>
 
-class BBox;
-class BCheckBox;
 class BMenuField;
 class BPopUpMenu;
 class BSlider;
-class BTextView;
 
 
 class AntialiasingSettingsView : public BView {
@@ -30,20 +27,15 @@ public:
 			bool			IsRevertable();
 
 private:
-			void			_BuildAntialiasingMenu();
-			void			_SetCurrentAntialiasing();
-			void			_BuildHintingMenu();
-			void			_SetCurrentHinting();
+			void			_BuildRenderModeMenu();
+			void			_ApplyRenderMode(int32 renderMode);
+			int32			_CurrentRenderMode() const;
+			void			_SetCurrentRenderMode();
 			void			_SetCurrentAverageWeight();
 
 protected:
-			float			fDivider;
-
-			BMenuField*		fAntialiasingMenuField;
-			BPopUpMenu*		fAntialiasingMenu;
-			BMenuField*		fHintingMenuField;
-			BPopUpMenu*		fHintingMenu;
-			BCheckBox*		fMonospacedCheckBox;
+			BMenuField*		fRenderModeMenuField;
+			BPopUpMenu*		fRenderModeMenu;
 			BSlider*		fAverageWeightControl;
 
 			bool			fSavedSubpixelAntialiasing;
@@ -53,5 +45,6 @@ protected:
 			unsigned char	fSavedAverageWeight;
 			unsigned char	fCurrentAverageWeight;
 };
+
 
 #endif // ANTIALIASING_SETTINGS_VIEW_H
