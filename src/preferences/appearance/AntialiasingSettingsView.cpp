@@ -178,7 +178,7 @@ AntialiasingSettingsView::MessageReceived(BMessage *msg)
 			fCurrentHinting = hinting;
 			set_hinting_mode(fCurrentHinting);
 
-			// I need to check HINTING_MODE_MONOSPACED_ONLY too.. 
+			// I need to check HINTING_MODE_MONOSPACED_ONLY too...
 			// for case the user have active that previus this change
 			fMonospacedCheckBox->SetEnabled(fCurrentHinting == HINTING_MODE_ON
 				|| fCurrentHinting == HINTING_MODE_LIGHT
