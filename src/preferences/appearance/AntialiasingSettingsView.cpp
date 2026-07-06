@@ -12,6 +12,7 @@
 
 #include <Box.h>
 #include <Catalog.h>
+#include <CheckBox.h>
 #include <LayoutBuilder.h>
 #include <Locale.h>
 #include <MenuField.h>
@@ -29,22 +30,15 @@
 #define B_TRANSLATION_CONTEXT "AntialiasingSettingsView"
 
 
-static const int32 kMsgSetRenderMode = 'rndm';
+static const int32 kMsgSetAntialiasing = 'anti';
+static const int32 kMsgSetHinting = 'hint';
+static const int32 kMsgSetHintingMonospaced = 'hmsp';
 static const int32 kMsgSetAverageWeight = 'avrg';
-
-// Combo labels
-static const char* kStandardNoHintingLabel
-	= B_TRANSLATE_MARK("Standard - No hinting");
-static const char* kStandardLightLabel
-	= B_TRANSLATE_MARK("Standard - Light hinting");
-static const char* kStandardFullLabel
-	= B_TRANSLATE_MARK("Standard - Full hinting");
-static const char* kStandardMonospacedLabel
-	= B_TRANSLATE_MARK("Standard - Full hinting (Monospaced only)");
-static const char* kSubpixelLabel
-	= B_TRANSLATE_MARK("Subpixel LCD");
-static const char* kSubpixelLightLabel
-	= B_TRANSLATE_MARK("Subpixel LCD - Light hinting");
+static const char* kSubpixelLabel = B_TRANSLATE_MARK("LCD subpixel");
+static const char* kGrayscaleLabel = B_TRANSLATE_MARK("Grayscale");
+static const char* kNoHintingLabel = B_TRANSLATE_MARK("Off");
+static const char* kFullHintingLabel = B_TRANSLATE_MARK("Normal hinting");
+static const char* kLightHintingLabel = B_TRANSLATE_MARK("Light hinting");
 
 
 // #pragma mark - private libbe API
@@ -55,16 +49,6 @@ enum {
 	HINTING_MODE_ON,
 	HINTING_MODE_MONOSPACED_ONLY,
 	HINTING_MODE_LIGHT
-};
-
-// Unified render mode indices for the combo
-enum {
-	RENDER_MODE_STANDARD_NO_HINTING = 0,
-	RENDER_MODE_STANDARD_LIGHT,
-	RENDER_MODE_STANDARD_FULL,
-	RENDER_MODE_STANDARD_MONOSPACED,
-	RENDER_MODE_SUBPIXEL,
-	RENDER_MODE_SUBPIXEL_LIGHT
 };
 
 static const uint8 kDefaultHintingMode = HINTING_MODE_ON;
@@ -100,10 +84,10 @@ AntialiasingSettingsView::AntialiasingSettingsView(const char* name)
 
 	// create the controls
 
-	// unified render mode menu
-	_BuildRenderModeMenu();
-	fRenderModeMenuField = new BMenuField("renderMode",
-		B_TRANSLATE("Font rendering:"), fRenderModeMenu);
+	// antialiasing menu
+	_BuildAntialiasingMenu();
+	fAntialiasingMenuField = new BMenuField("antialiasing",
+		B_TRANSLATE("Antialiasing type:"), fAntialiasingMenu);
 
 	// "average weight" in subpixel filtering
 	fAverageWeightControl = new BSlider("averageWeightControl",
@@ -113,19 +97,33 @@ AntialiasingSettingsView::AntialiasingSettingsView(const char* name)
 		B_TRANSLATE("Strong"));
 	fAverageWeightControl->SetHashMarks(B_HASH_MARKS_BOTTOM);
 	fAverageWeightControl->SetHashMarkCount(255 / 15);
-	fAverageWeightControl->SetEnabled(fCurrentSubpixelAntialiasing);
+	fAverageWeightControl->SetEnabled(false);
+
+	// hinting menu
+	_BuildHintingMenu();
+	fHintingMenuField = new BMenuField("hinting", B_TRANSLATE("Glyph hinting:"),
+		fHintingMenu);
+
+	// checkbox for monospaced only
+	fMonospacedCheckBox = new BCheckBox("monospaced", B_TRANSLATE("Fixed font only"),
+		new BMessage(kMsgSetHintingMonospaced));
 
 	BLayoutBuilder::Group<>(this, B_VERTICAL, B_USE_DEFAULT_SPACING)
+	// controls pane
 		.AddGrid(B_USE_DEFAULT_SPACING, B_USE_DEFAULT_SPACING)
-			.Add(fRenderModeMenuField->CreateLabelLayoutItem(), 0, 0)
-			.Add(fRenderModeMenuField->CreateMenuBarLayoutItem(), 1, 0)
+			.Add(fHintingMenuField->CreateLabelLayoutItem(), 0, 0)
+			.Add(fHintingMenuField->CreateMenuBarLayoutItem(), 1, 0)
+			.Add(fMonospacedCheckBox, 1, 1)
+			.Add(fAntialiasingMenuField->CreateLabelLayoutItem(), 0, 2)
+			.Add(fAntialiasingMenuField->CreateMenuBarLayoutItem(), 1, 2)
 			.AddGlue(2, 0)
 		.End()
 		.Add(fAverageWeightControl)
 		.AddGlue()
 		.SetInsets(B_USE_WINDOW_SPACING);
 
-	_SetCurrentRenderMode();
+	_SetCurrentAntialiasing();
+	_SetCurrentHinting();
 	_SetCurrentAverageWeight();
 }
 
@@ -143,7 +141,9 @@ AntialiasingSettingsView::AttachedToWindow()
 	if (Parent() == NULL)
 		SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 
-	fRenderModeMenu->SetTargetForItems(this);
+	fAntialiasingMenu->SetTargetForItems(this);
+	fHintingMenu->SetTargetForItems(this);
+	fMonospacedCheckBox->SetTarget(this);
 	fAverageWeightControl->SetTarget(this);
 }
 
@@ -152,13 +152,51 @@ void
 AntialiasingSettingsView::MessageReceived(BMessage *msg)
 {
 	switch (msg->what) {
-		case kMsgSetRenderMode:
+		case kMsgSetAntialiasing:
 		{
-			int32 renderMode;
-			if (msg->FindInt32("render_mode", &renderMode) != B_OK)
+			bool subpixelAntialiasing;
+			if (msg->FindBool("antialiasing", &subpixelAntialiasing) != B_OK
+				|| subpixelAntialiasing == fCurrentSubpixelAntialiasing)
 				break;
 
-			_ApplyRenderMode(renderMode);
+			fCurrentSubpixelAntialiasing = subpixelAntialiasing;
+			fAverageWeightControl->SetEnabled(fCurrentSubpixelAntialiasing);
+
+			set_subpixel_antialiasing(fCurrentSubpixelAntialiasing);
+
+			Window()->PostMessage(kMsgUpdate);
+			break;
+		}
+		case kMsgSetHinting:
+		{
+			int8 hinting;
+			if (msg->FindInt8("hinting", &hinting) != B_OK
+				|| hinting == fCurrentHinting)
+				break;
+
+			fCurrentHinting = hinting;
+			set_hinting_mode(fCurrentHinting);
+
+			// I need to check HINTING_MODE_MONOSPACED_ONLY too.. 
+			// for case the user have active that previus this change
+			fMonospacedCheckBox->SetEnabled(fCurrentHinting == HINTING_MODE_ON
+				|| fCurrentHinting == HINTING_MODE_MONOSPACED_ONLY);
+
+			Window()->PostMessage(kMsgUpdate);
+			break;
+		}
+		case kMsgSetHintingMonospaced:
+		{
+			bool monospaced = fMonospacedCheckBox->Value() == B_CONTROL_ON;
+			uint8 newMode = monospaced
+				? HINTING_MODE_MONOSPACED_ONLY : HINTING_MODE_ON;
+
+			if (newMode == fCurrentHinting)
+				break;
+
+			fCurrentHinting = newMode;
+			set_hinting_mode(fCurrentHinting);
+
 			Window()->PostMessage(kMsgUpdate);
 			break;
 		}
@@ -169,6 +207,7 @@ AntialiasingSettingsView::MessageReceived(BMessage *msg)
 				break;
 
 			fCurrentAverageWeight = averageWeight;
+
 			set_average_weight(fCurrentAverageWeight);
 
 			Window()->PostMessage(kMsgUpdate);
@@ -181,108 +220,92 @@ AntialiasingSettingsView::MessageReceived(BMessage *msg)
 
 
 void
-AntialiasingSettingsView::_BuildRenderModeMenu()
+AntialiasingSettingsView::_BuildAntialiasingMenu()
 {
-	fRenderModeMenu = new BPopUpMenu(B_TRANSLATE("Render mode menu"));
+	fAntialiasingMenu = new BPopUpMenu(B_TRANSLATE("Antialiasing menu"));
 
-	struct {
-		const char* label;
-		int32 mode;
-	} items[] = {
-		{ kStandardNoHintingLabel, RENDER_MODE_STANDARD_NO_HINTING },
-		{ kStandardLightLabel, RENDER_MODE_STANDARD_LIGHT },
-		{ kStandardFullLabel, RENDER_MODE_STANDARD_FULL },
-		{ kStandardMonospacedLabel, RENDER_MODE_STANDARD_MONOSPACED },
-		{ kSubpixelLabel, RENDER_MODE_SUBPIXEL },
-		{ kSubpixelLightLabel, RENDER_MODE_SUBPIXEL_LIGHT },
-	};
+	BMessage* message = new BMessage(kMsgSetAntialiasing);
+	message->AddBool("antialiasing", false);
 
-	for (size_t i = 0; i < B_COUNT_OF(items); i++) {
-		BMessage *message = new BMessage(kMsgSetRenderMode);
-		message->AddInt32("render_mode", items[i].mode);
-		fRenderModeMenu->AddItem(new BMenuItem(
-			B_TRANSLATE_NOCOLLECT(items[i].label), message));
-	}
+	BMenuItem* item
+		= new BMenuItem(B_TRANSLATE_NOCOLLECT(kGrayscaleLabel), message);
+
+	fAntialiasingMenu->AddItem(item);
+
+	message = new BMessage(kMsgSetAntialiasing);
+	message->AddBool("antialiasing", true);
+
+	item = new BMenuItem(B_TRANSLATE_NOCOLLECT(kSubpixelLabel), message);
+
+	fAntialiasingMenu->AddItem(item);
 }
 
 
 void
-AntialiasingSettingsView::_ApplyRenderMode(int32 renderMode)
+AntialiasingSettingsView::_BuildHintingMenu()
 {
-	bool subpixel = false;
-	uint8 hinting = HINTING_MODE_ON;
+	fHintingMenu = new BPopUpMenu(B_TRANSLATE("Hinting menu"));
 
-	switch (renderMode) {
-		case RENDER_MODE_STANDARD_NO_HINTING:
-			subpixel = false;
-			hinting = HINTING_MODE_OFF;
-			break;
-		case RENDER_MODE_STANDARD_LIGHT:
-			subpixel = false;
-			hinting = HINTING_MODE_LIGHT;
-			break;
-		case RENDER_MODE_STANDARD_FULL:
-			subpixel = false;
-			hinting = HINTING_MODE_ON;
-			break;
-		case RENDER_MODE_STANDARD_MONOSPACED:
-			subpixel = false;
-			hinting = HINTING_MODE_MONOSPACED_ONLY;
-			break;
-		case RENDER_MODE_SUBPIXEL:
-			subpixel = true;
-			hinting = HINTING_MODE_ON;
-			break;
-		case RENDER_MODE_SUBPIXEL_LIGHT:
-			subpixel = true;
-			hinting = HINTING_MODE_LIGHT;
-			break;
-	}
+	BMessage* message = new BMessage(kMsgSetHinting);
+	message->AddInt8("hinting", HINTING_MODE_OFF);
+	fHintingMenu->AddItem(new BMenuItem(B_TRANSLATE_NOCOLLECT(kNoHintingLabel),
+		message));
 
-	if (subpixel != fCurrentSubpixelAntialiasing) {
-		fCurrentSubpixelAntialiasing = subpixel;
-		set_subpixel_antialiasing(fCurrentSubpixelAntialiasing);
-	}
+	message = new BMessage(kMsgSetHinting);
+	message->AddInt8("hinting", HINTING_MODE_ON);
+	fHintingMenu->AddItem(new BMenuItem(
+		B_TRANSLATE_NOCOLLECT(kFullHintingLabel), message));
 
-	if (hinting != fCurrentHinting) {
-		fCurrentHinting = hinting;
-		set_hinting_mode(fCurrentHinting);
-	}
-
-	fAverageWeightControl->SetEnabled(fCurrentSubpixelAntialiasing);
-}
-
-
-int32
-AntialiasingSettingsView::_CurrentRenderMode() const
-{
-	if (fCurrentSubpixelAntialiasing) {
-		if (fCurrentHinting == HINTING_MODE_LIGHT)
-			return RENDER_MODE_SUBPIXEL_LIGHT;
-		return RENDER_MODE_SUBPIXEL;
-	}
-
-	switch (fCurrentHinting) {
-		case HINTING_MODE_OFF:
-			return RENDER_MODE_STANDARD_NO_HINTING;
-		case HINTING_MODE_LIGHT:
-			return RENDER_MODE_STANDARD_LIGHT;
-		case HINTING_MODE_MONOSPACED_ONLY:
-			return RENDER_MODE_STANDARD_MONOSPACED;
-		default:
-			return RENDER_MODE_STANDARD_FULL;
-	}
+	message = new BMessage(kMsgSetHinting);
+	message->AddInt8("hinting", HINTING_MODE_LIGHT);
+	fHintingMenu->AddItem(new BMenuItem(
+		B_TRANSLATE_NOCOLLECT(kLightHintingLabel), message));
 }
 
 
 void
-AntialiasingSettingsView::_SetCurrentRenderMode()
+AntialiasingSettingsView::_SetCurrentAntialiasing()
 {
-	int32 renderMode = _CurrentRenderMode();
-	BMenuItem *item = fRenderModeMenu->ItemAt(renderMode);
+	BMenuItem *item = fAntialiasingMenu->FindItem(
+		fCurrentSubpixelAntialiasing
+		? B_TRANSLATE_NOCOLLECT(kSubpixelLabel)
+		: B_TRANSLATE_NOCOLLECT(kGrayscaleLabel));
 	if (item != NULL)
 		item->SetMarked(true);
-	fAverageWeightControl->SetEnabled(fCurrentSubpixelAntialiasing);
+	if (fCurrentSubpixelAntialiasing)
+		fAverageWeightControl->SetEnabled(true);
+}
+
+
+void
+AntialiasingSettingsView::_SetCurrentHinting()
+{
+	const char* label;
+	switch (fCurrentHinting) {
+		case HINTING_MODE_OFF:
+			label = kNoHintingLabel;
+			break;
+		case HINTING_MODE_ON:
+		case HINTING_MODE_MONOSPACED_ONLY:
+			label = kFullHintingLabel;
+			break;
+		case HINTING_MODE_LIGHT:
+			label = kLightHintingLabel;
+			break;
+		default:
+			return;
+	}
+
+	BMenuItem *item = fHintingMenu->FindItem(B_TRANSLATE_NOCOLLECT(label));
+	if (item != NULL)
+		item->SetMarked(true);
+
+	bool enableMonospaced = (fCurrentHinting == HINTING_MODE_ON
+		|| fCurrentHinting == HINTING_MODE_MONOSPACED_ONLY);
+	fMonospacedCheckBox->SetEnabled(enableMonospaced);
+	fMonospacedCheckBox->SetValue(
+		fCurrentHinting == HINTING_MODE_MONOSPACED_ONLY
+		? B_CONTROL_ON : B_CONTROL_OFF);
 }
 
 
@@ -307,7 +330,8 @@ AntialiasingSettingsView::SetDefaults()
 	set_hinting_mode(fCurrentHinting);
 	set_average_weight(fCurrentAverageWeight);
 
-	_SetCurrentRenderMode();
+	_SetCurrentAntialiasing();
+	_SetCurrentHinting();
 	_SetCurrentAverageWeight();
 }
 
@@ -344,6 +368,7 @@ AntialiasingSettingsView::Revert()
 	set_hinting_mode(fCurrentHinting);
 	set_average_weight(fCurrentAverageWeight);
 
-	_SetCurrentRenderMode();
+	_SetCurrentAntialiasing();
+	_SetCurrentHinting();
 	_SetCurrentAverageWeight();
 }
