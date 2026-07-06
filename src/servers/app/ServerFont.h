@@ -214,6 +214,7 @@ inline bool ServerFont::Hinting() const
 		case HINTING_MODE_LIGHT:
 			return true;
 		case HINTING_MODE_MONOSPACED_ONLY:
+		case HINTING_MODE_LIGHT_MONOSPACED_ONLY:
 			return IsFixedWidth();
 	}
 }
@@ -228,6 +229,10 @@ inline uint8 ServerFont::HintingMode() const
 			if (!IsFixedWidth())
 				return HINTING_MODE_OFF;
 			return HINTING_MODE_ON;
+		case HINTING_MODE_LIGHT_MONOSPACED_ONLY:
+			if (!IsFixedWidth())
+				return HINTING_MODE_OFF;
+			return HINTING_MODE_LIGHT;
 		case HINTING_MODE_LIGHT:
 			return HINTING_MODE_LIGHT;
 		default:

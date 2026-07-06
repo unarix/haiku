@@ -48,7 +48,8 @@ enum {
 	HINTING_MODE_OFF = 0,
 	HINTING_MODE_ON,
 	HINTING_MODE_MONOSPACED_ONLY,
-	HINTING_MODE_LIGHT
+	HINTING_MODE_LIGHT,
+	HINTING_MODE_LIGHT_MONOSPACED_ONLY
 };
 
 static const uint8 kDefaultHintingMode = HINTING_MODE_ON;
@@ -113,10 +114,10 @@ AntialiasingSettingsView::AntialiasingSettingsView(const char* name)
 		.AddGrid(B_USE_DEFAULT_SPACING, B_USE_DEFAULT_SPACING)
 			.Add(fHintingMenuField->CreateLabelLayoutItem(), 0, 0)
 			.Add(fHintingMenuField->CreateMenuBarLayoutItem(), 1, 0)
-			.Add(fMonospacedCheckBox, 1, 1)
-			.Add(fAntialiasingMenuField->CreateLabelLayoutItem(), 0, 2)
-			.Add(fAntialiasingMenuField->CreateMenuBarLayoutItem(), 1, 2)
-			.AddGlue(2, 0)
+			.Add(fMonospacedCheckBox, 2, 0)
+			.Add(fAntialiasingMenuField->CreateLabelLayoutItem(), 0, 1)
+			.Add(fAntialiasingMenuField->CreateMenuBarLayoutItem(), 1, 1)
+			.AddGlue(3, 0)
 		.End()
 		.Add(fAverageWeightControl)
 		.AddGlue()
@@ -180,7 +181,9 @@ AntialiasingSettingsView::MessageReceived(BMessage *msg)
 			// I need to check HINTING_MODE_MONOSPACED_ONLY too.. 
 			// for case the user have active that previus this change
 			fMonospacedCheckBox->SetEnabled(fCurrentHinting == HINTING_MODE_ON
-				|| fCurrentHinting == HINTING_MODE_MONOSPACED_ONLY);
+				|| fCurrentHinting == HINTING_MODE_LIGHT
+				|| fCurrentHinting == HINTING_MODE_MONOSPACED_ONLY
+				|| fCurrentHinting == HINTING_MODE_LIGHT_MONOSPACED_ONLY);
 
 			Window()->PostMessage(kMsgUpdate);
 			break;
@@ -188,8 +191,16 @@ AntialiasingSettingsView::MessageReceived(BMessage *msg)
 		case kMsgSetHintingMonospaced:
 		{
 			bool monospaced = fMonospacedCheckBox->Value() == B_CONTROL_ON;
-			uint8 newMode = monospaced
-				? HINTING_MODE_MONOSPACED_ONLY : HINTING_MODE_ON;
+			uint8 newMode;
+
+			if (monospaced) {
+				newMode = (fCurrentHinting == HINTING_MODE_ON)
+					? HINTING_MODE_MONOSPACED_ONLY
+					: HINTING_MODE_LIGHT_MONOSPACED_ONLY;
+			} else {
+				newMode = (fCurrentHinting == HINTING_MODE_MONOSPACED_ONLY)
+					? HINTING_MODE_ON : HINTING_MODE_LIGHT;
+			}
 
 			if (newMode == fCurrentHinting)
 				break;
@@ -290,6 +301,7 @@ AntialiasingSettingsView::_SetCurrentHinting()
 			label = kFullHintingLabel;
 			break;
 		case HINTING_MODE_LIGHT:
+		case HINTING_MODE_LIGHT_MONOSPACED_ONLY:
 			label = kLightHintingLabel;
 			break;
 		default:
@@ -301,10 +313,13 @@ AntialiasingSettingsView::_SetCurrentHinting()
 		item->SetMarked(true);
 
 	bool enableMonospaced = (fCurrentHinting == HINTING_MODE_ON
-		|| fCurrentHinting == HINTING_MODE_MONOSPACED_ONLY);
+		|| fCurrentHinting == HINTING_MODE_LIGHT
+		|| fCurrentHinting == HINTING_MODE_MONOSPACED_ONLY
+		|| fCurrentHinting == HINTING_MODE_LIGHT_MONOSPACED_ONLY);
 	fMonospacedCheckBox->SetEnabled(enableMonospaced);
 	fMonospacedCheckBox->SetValue(
-		fCurrentHinting == HINTING_MODE_MONOSPACED_ONLY
+		(fCurrentHinting == HINTING_MODE_MONOSPACED_ONLY
+		|| fCurrentHinting == HINTING_MODE_LIGHT_MONOSPACED_ONLY)
 		? B_CONTROL_ON : B_CONTROL_OFF);
 }
 
