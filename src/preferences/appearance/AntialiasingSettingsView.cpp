@@ -108,6 +108,9 @@ AntialiasingSettingsView::AntialiasingSettingsView(const char* name)
 	// checkbox for monospaced only
 	fMonospacedCheckBox = new BCheckBox("monospaced", B_TRANSLATE("Fixed font only"),
 		new BMessage(kMsgSetHintingMonospaced));
+	fMonospacedCheckBox->SetExplicitMinSize(
+		BSize(fMonospacedCheckBox->StringWidth(fMonospacedCheckBox->Label()) + 30,
+		B_SIZE_UNSET));
 
 	BLayoutBuilder::Group<>(this, B_VERTICAL, B_USE_DEFAULT_SPACING)
 	// controls pane
