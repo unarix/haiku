@@ -108,17 +108,20 @@ AntialiasingSettingsView::AntialiasingSettingsView(const char* name)
 	// checkbox for monospaced only
 	fMonospacedCheckBox = new BCheckBox("monospaced", B_TRANSLATE("Fixed font only"),
 		new BMessage(kMsgSetHintingMonospaced));
-	fMonospacedCheckBox->SetExplicitMinSize(
-		BSize(fMonospacedCheckBox->PreferredSize().Width() + 30, B_SIZE_UNSET));
+
+	BLayoutItem* hintingMenuBar = fHintingMenuField->CreateMenuBarLayoutItem();
+	hintingMenuBar->SetExplicitMaxSize(
+		BSize(hintingMenuBar->PreferredSize().Width(), B_SIZE_UNSET));
 
 	BLayoutBuilder::Group<>(this, B_VERTICAL, B_USE_DEFAULT_SPACING)
 	// controls pane
 		.AddGrid(B_USE_DEFAULT_SPACING, B_USE_DEFAULT_SPACING)
 			.Add(fHintingMenuField->CreateLabelLayoutItem(), 0, 0)
-			.Add(fHintingMenuField->CreateMenuBarLayoutItem(), 1, 0)
+			.Add(hintingMenuBar, 1, 0)
 			.Add(fMonospacedCheckBox, 2, 0)
 			.Add(fAntialiasingMenuField->CreateLabelLayoutItem(), 0, 1)
 			.Add(fAntialiasingMenuField->CreateMenuBarLayoutItem(), 1, 1)
+			.AddGlue(2, 1)
 		.End()
 		.Add(fAverageWeightControl)
 		.AddGlue()
