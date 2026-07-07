@@ -110,8 +110,15 @@ AntialiasingSettingsView::AntialiasingSettingsView(const char* name)
 		new BMessage(kMsgSetHintingMonospaced));
 
 	BLayoutItem* hintingMenuBar = fHintingMenuField->CreateMenuBarLayoutItem();
-	hintingMenuBar->SetExplicitMaxSize(
-		BSize(hintingMenuBar->PreferredSize().Width(), B_SIZE_UNSET));
+
+	float maxWidth = 0;
+	for (int32 i = 0; i < fHintingMenu->CountItems(); i++) {
+		float w = fHintingMenuField->StringWidth(fHintingMenu->ItemAt(i)->Label());
+		if (w > maxWidth)
+			maxWidth = w;
+	}
+	hintingMenuBar->SetExplicitMinSize(BSize(maxWidth + 40, B_SIZE_UNSET));
+	hintingMenuBar->SetExplicitMaxSize(BSize(maxWidth + 40, B_SIZE_UNSET));
 
 	BLayoutBuilder::Group<>(this, B_VERTICAL, B_USE_DEFAULT_SPACING)
 	// controls pane
