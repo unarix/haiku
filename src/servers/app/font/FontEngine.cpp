@@ -485,20 +485,14 @@ FontEngine::GlyphIndexForGlyphCode(uint32 glyphCode) const
 bool
 FontEngine::PrepareGlyph(uint32 glyphIndex)
 {
-	FT_Int32 loadFlags = fHintingMode != HINTING_MODE_OFF
-		? FT_LOAD_DEFAULT : FT_LOAD_NO_HINTING;
+	FT_Int32 loadFlags = fHintingMode != HINTING_MODE_OFF ? FT_LOAD_DEFAULT : FT_LOAD_NO_HINTING;
 
 	if (fGlyphRendering == glyph_ren_subpix) {
 		loadFlags |= FT_LOAD_TARGET_LCD;
-	}
-	else if (fHintingMode == HINTING_MODE_LIGHT) {
-		// Apply light hinting for not compress letter spacing.
-		// FT_LOAD_FORCE_AUTOHINT for best results
+	} else if (fHintingMode == HINTING_MODE_LIGHT) {
 		loadFlags |= FT_LOAD_TARGET_LIGHT;
 		loadFlags |= FT_LOAD_FORCE_AUTOHINT;
-	}
-	else
-	{
+	} else {
 		loadFlags |= FT_LOAD_TARGET_NORMAL;
 	}
 

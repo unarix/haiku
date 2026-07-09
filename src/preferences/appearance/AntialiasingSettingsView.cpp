@@ -117,9 +117,7 @@ AntialiasingSettingsView::AntialiasingSettingsView(const char* name)
 		if (w > maxWidth)
 			maxWidth = w;
 	}
-	hintingMenuBar->SetExplicitMinSize(BSize(maxWidth + 40, B_SIZE_UNSET));
-	hintingMenuBar->SetExplicitMaxSize(BSize(maxWidth + 40, B_SIZE_UNSET));
-
+	
 	BLayoutBuilder::Group<>(this, B_VERTICAL, B_USE_DEFAULT_SPACING)
 	// controls pane
 		.AddGrid(B_USE_DEFAULT_SPACING, B_USE_DEFAULT_SPACING)
@@ -182,15 +180,22 @@ AntialiasingSettingsView::MessageReceived(BMessage *msg)
 		case kMsgSetHinting:
 		{
 			int8 hinting;
-			if (msg->FindInt8("hinting", &hinting) != B_OK
-				|| hinting == fCurrentHinting)
+			if (msg->FindInt8("hinting", &hinting) != B_OK)
+				break;
+
+			if (fMonospacedCheckBox->Value() == B_CONTROL_ON) {
+				if (hinting == HINTING_MODE_ON)
+					hinting = HINTING_MODE_MONOSPACED_ONLY;
+				else if (hinting == HINTING_MODE_LIGHT)
+					hinting = HINTING_MODE_LIGHT_MONOSPACED_ONLY;
+			}
+
+			if (hinting == fCurrentHinting)
 				break;
 
 			fCurrentHinting = hinting;
 			set_hinting_mode(fCurrentHinting);
 
-			// I need to check HINTING_MODE_MONOSPACED_ONLY too...
-			// for case the user have active that previus this change
 			fMonospacedCheckBox->SetEnabled(fCurrentHinting == HINTING_MODE_ON
 				|| fCurrentHinting == HINTING_MODE_LIGHT
 				|| fCurrentHinting == HINTING_MODE_MONOSPACED_ONLY

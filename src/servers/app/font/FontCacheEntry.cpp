@@ -401,8 +401,7 @@ FontCacheEntry::GenerateSignature(char* signature, size_t signatureSize,
 
 	snprintf(signature, signatureSize, "%" B_PRId32 ",%p,%u,%d,%d,%.1f,%d,%d",
 		font.GetFamilyAndStyle(), font.Manager(), charMap,
-		font.Face(), int(renderingType), font.Size(), hintingMode,
-		averageWeight);
+		font.Face(), int(renderingType), font.Size(), hintingMode, averageWeight);
 }
 
 
