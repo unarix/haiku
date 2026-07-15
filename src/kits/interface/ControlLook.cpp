@@ -192,7 +192,34 @@ B_IF_GCC_2(_ReservedControlLook5__Q28BPrivate12BControlLook,
 }
 
 
-void BControlLook::_ReservedControlLook6() {}
+void
+BControlLook::DrawMenuSeparator(BView* view, BRect& rect,
+	const rgb_color& base, orientation orientation)
+{
+	rgb_color oldColor = view->HighColor();
+
+	if (orientation == B_HORIZONTAL) {
+		const float startTop = rect.top + floorf(rect.Height() / 2);
+		view->SetHighColor(tint_color(base, B_DARKEN_1_TINT));
+		view->StrokeLine(BPoint(rect.left + 1.0f, startTop),
+			BPoint(rect.right - 1.0f, startTop));
+		view->SetHighColor(tint_color(base, B_LIGHTEN_2_TINT));
+		view->StrokeLine(BPoint(rect.left + 1.0f, startTop + 1.0f),
+			BPoint(rect.right - 1.0f, startTop + 1.0f));
+	} else {
+		const float startLeft = rect.left + floorf(rect.Width() / 2);
+		view->SetHighColor(tint_color(base, B_DARKEN_1_TINT));
+		view->StrokeLine(BPoint(startLeft, rect.top + 1.0f),
+			BPoint(startLeft, rect.bottom - 1.0f));
+		view->SetHighColor(tint_color(base, B_LIGHTEN_2_TINT));
+		view->StrokeLine(BPoint(startLeft + 1.0f, rect.top + 1.0f),
+			BPoint(startLeft + 1.0f, rect.bottom - 1.0f));
+	}
+
+	view->SetHighColor(oldColor);
+}
+
+
 void BControlLook::_ReservedControlLook7() {}
 void BControlLook::_ReservedControlLook8() {}
 void BControlLook::_ReservedControlLook9() {}

@@ -11,6 +11,7 @@
 
 #include <SeparatorItem.h>
 
+#include <ControlLook.h>
 #include <Font.h>
 
 
@@ -92,27 +93,11 @@ BSeparatorItem::Draw()
 		return;
 
 	BRect bounds = Frame();
-	rgb_color oldColor = menu->HighColor();
-	rgb_color lowColor = menu->LowColor();
+	rgb_color base = menu->LowColor();
+	orientation orient = menu->Layout() == B_ITEMS_IN_ROW
+		? B_VERTICAL : B_HORIZONTAL;
 
-	if (menu->Layout() == B_ITEMS_IN_ROW) {
-		const float startLeft = bounds.left + (floor(bounds.Width())) / 2;
-		menu->SetHighColor(tint_color(lowColor, B_DARKEN_1_TINT));
-		menu->StrokeLine(BPoint(startLeft, bounds.top + 1.0f),
-			BPoint(startLeft, bounds.bottom - 1.0f));
-		menu->SetHighColor(tint_color(lowColor, B_LIGHTEN_2_TINT));
-		menu->StrokeLine(BPoint(startLeft + 1.0f, bounds.top + 1.0f),
-			BPoint(startLeft + 1.0f, bounds.bottom - 1.0f));
-	} else {
-		const float startTop = bounds.top + (floor(bounds.Height())) / 2;
-		menu->SetHighColor(tint_color(lowColor, B_DARKEN_1_TINT));
-		menu->StrokeLine(BPoint(bounds.left + 1.0f, startTop),
-			BPoint(bounds.right - 1.0f, startTop));
-		menu->SetHighColor(tint_color(lowColor, B_LIGHTEN_2_TINT));
-		menu->StrokeLine(BPoint(bounds.left + 1.0f, startTop + 1.0f),
-			BPoint(bounds.right - 1.0f, startTop + 1.0f));
-	}
-	menu->SetHighColor(oldColor);
+	be_control_look->DrawMenuSeparator(menu, bounds, base, orient);
 }
 
 

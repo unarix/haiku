@@ -433,9 +433,12 @@ public:
 	static	bool				ShouldDraw(BView* view, const BRect& rect,
 									const BRect& updateRect);
 
+public:
+	virtual	void				DrawMenuSeparator(BView* view,
+									BRect& rect, const rgb_color& base,
+									orientation orientation = B_HORIZONTAL);
 private:
 	// FBC padding
-	virtual	void				_ReservedControlLook6();
 	virtual	void				_ReservedControlLook7();
 	virtual	void				_ReservedControlLook8();
 	virtual	void				_ReservedControlLook9();
